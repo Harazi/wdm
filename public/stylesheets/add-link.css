@@ -1,0 +1,4 @@
+#popup .add-link {
+  display: grid;
+  grid-template-rows: 2em 1em;
+}

@@ -1,0 +1,75 @@
+main {
+  #download-list {
+    ul {
+      display: grid;
+      grid-auto-rows: 80px;
+
+      li {
+        // border-top: 1px solid black;
+        display: grid;
+        margin: 0.3em 0 0 0.5em;
+
+        // Let the browser decide the proper values
+        // grid-template-columns: repeat(4, 1fr);
+        // grid-template-rows: repeat(4, 1fr);
+
+        grid-template-areas:
+          "filename filename . ."
+          "download-url download-url download-url controll-button"
+          "download-prog download-prog download-prog controll-button"
+          "download-prog download-prog download-prog .";
+
+        .filename {
+          // grid-column: 1 / 3;
+          grid-area: filename;
+          font-size: 0.8rem;
+        }
+
+        .download-url {
+          // grid-column: 1 / 4;
+          // grid-row: 2 / 3;
+          grid-area: download-url;
+
+          color: rgba(128, 128, 128, 0.7);
+          text-overflow: ellipsis;
+          overflow: hidden;
+          font-size: 0.6rem;
+          font-style: italic;
+        }
+        
+        .download-prog {
+          // grid-column: 1 / 4;
+          // grid-row: 3 / 5;
+          grid-area: download-prog;
+
+          width: 100%;
+          cursor: progress;
+        }
+        
+        .controll-button {
+          // grid-column: 4 / 5;
+          // grid-row: 2 / 4;
+          grid-area: controll-button;
+
+          text-align: center;
+
+          button {
+            background-color: transparent;
+            border: none;
+
+            // Hardcode image resulotion (24 x 24)
+            width: 24px;
+            height: 24px;
+
+            &.play {
+              background-image: url("https://img.icons8.com/material-outlined/24/000000/play--v1.png");
+            }
+            &.pause {
+              background-image: url("https://img.icons8.com/material-outlined/24/000000/pause--v1.png");
+            }
+          }
+        }
+      }
+    }
+  }
+}
