@@ -8,7 +8,7 @@ export default function Popup({ children, title, closeFn }) {
   }
 
   return (
-    <div id="popup" onClick={click}>
+    <div id="popup" onMouseDown={click}>
 
       <div className="popup-box">
 

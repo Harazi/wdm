@@ -7,8 +7,9 @@ import { URL } from "node:url"
 const app = express()
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin",  "http://localhost:5500")
-  res.setHeader("Access-Control-Allow-Headers", "x-wdm, content-length")
+  res.setHeader("Access-Control-Allow-Origin", "*")
+  res.setHeader("Access-Control-Allow-Headers", "x-wdm")
+  res.setHeader("Access-Control-Expose-Headers", "content-length, x-wdm-finalurl")
   console.log("CORS Middleware")
   next()
 })
@@ -24,7 +25,6 @@ app.get('/api/get', (req, res) => {
   
   delete req.headers["x-wdm"]
 
-  
 
   // requestPage(href, req.headers, serverRes => {
   proxyRequestPage(href, req.headers, serverRes => {
@@ -46,77 +46,104 @@ app.listen(5000, () => console.log("localhost:5000"))
 
 function requestPage(href, headers, cb, errorCb) {
 
+  delete headers["host"]
+  delete headers["origin"]
+
   const url = new URL(href)
 
   const options = {
     headers: {
       ...headers,
-      host: url.host,
-      hostname: url.hostname
+      Host: url.host,
+      Origin: url.origin
     }
   }
 
   if (url.protocol === "http:")
-    http.get(url, options, cb).on("error", errorCb)
+    http.get(url, options, handleRes).on("error", errorCb)
   else
-    https.get(url, options, cb).on("error", errorCb)
+    https.get(url, options, handleRes).on("error", errorCb)
 
+  function handleRes(res) {
 
-  /*
-  ** For Proxy Testing Only.
-  ** DO NOT push for production
-  */
+    console.log(res.statusCode, res.statusMessage)
 
-  // http.request({
-  //   method: "CONNECT",
-  //   href: "http://192.168.42.129:1337/",
-  //   protocol: "http:",
-  //   // hostname: "192.168.42.129:1337",
-  //   host: "192.168.42.129",
-  //   port: 1337,
-  //   path: url.hostname
-  // }).on("connect", (res, socket) => {
+    if (res.statusCode.toString()[0] === "3" && "location" in res.headers) {
 
-  //   if (res.statusCode !== 200)
-  //     return // Or `throw`?
+      if (res.headers.location[0] === "/") {
+        requestPage(url.origin + res.headers.location, headers, cb, errorCb)
+      }
 
-  //   const agent = new http.Agent({ socket })
-  //   options.agent = agent
+      else {
+        requestPage(res.headers.location, headers, cb, errorCb)
+      }
 
-  //   if (url.protocol === "http:")
-  //     http.get(url, options, cb)
-  //   else
-  //     https.get(url, options, cb)
-  // })
+      return
+    }
+
+    res.headers["x-wdm-finalurl"] = url.href
+
+    delete res.headers["set-cookie"]
+
+    cb(res)
+  }
 
 }
 
 function proxyRequestPage(href, headers, cb, errorCb) {
 
-  const url = new URL(href)
+  delete headers["host"]
+  delete headers["origin"]
 
-  console.log(url)
+  const url = new URL(href)
 
   if (url.protocol === "http:")
     return errorCb("http proxy hasn't been implmented yet!")
 
-  const proxyReq = http.request({
+  const proxyOptions = {
     method: "CONNECT",
     host: "192.168.42.129",
     port: 1337,
-    path: `${url.host}:443`,
-    headers
-  })
+    path: `${url.host}:443`
+  }
+
+  const proxyReq = http.request(proxyOptions)
 
   proxyReq.on("connect", (proxyRes, socket) => {
-    console.log(proxyRes.statusCode)
-    console.dir(proxyRes.headers)
 
-    https.get({
-      host: url.host,
-      path: '/',
+    https.get(url, {
+      headers: {
+        ...headers,
+        Host: url.host,
+        Origin: url.origin,
+        referer: `${url.origin}/`
+      },
       agent: new https.Agent({ socket })
-    }, cb)
+    }, res => {
+
+      console.log(res.statusCode, res.statusMessage)
+
+      if (res.statusCode.toString()[0] === "3" && "location" in res.headers) {
+        
+        if (res.headers.location[0] === "/") {
+          proxyRequestPage(url.origin + res.headers.location, headers, cb, errorCb)
+        }
+        
+        else {
+          proxyRequestPage(res.headers.location, headers, cb, errorCb)
+        }
+
+        return
+      }
+
+      res.headers["x-wdm-finalurl"] = url.href
+
+      delete res.headers["set-cookie"]
+
+      cb(res)
+
+    })
+
   })
 
   proxyReq.end()

@@ -3,6 +3,12 @@ import ReactDOM from "react-dom"
 import GetDirHandle from "./get-dir-handle.jsx"
 import Interface from "./interface.jsx"
 
+window._wdmConfig = {
+  scraperProxy: {
+    addLink: "http://localhost:5000/apt/get"
+  },
+}
+
 function App() {
 
   const [downloadDirHandle, setDownloadDirHandle] = React.useState(false)
@@ -17,7 +23,13 @@ function App() {
 
     // Development Code
     try {
+      // Get the directory access
       window.downloadDirHandle = await showDirectoryPicker({ startIn: "downloads" })
+
+      // Get read/write permissions
+      await window.downloadDirHandle.getFileHandle("wdm", { create: true })
+      await window.downloadDirHandle.removeEntry("wdm")
+      
       setDownloadDirHandle(window.downloadDirHandle)
     } catch (error) {
       console.error(error)

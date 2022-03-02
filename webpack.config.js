@@ -10,6 +10,8 @@ export default {
     filename: "bundle.js"
   },
 
+  mode: "development",
+
   module: {
     rules: [
       {
@@ -23,5 +25,11 @@ export default {
         }
       }
     ]
+  },
+
+  devServer: {
+    port: 8080,
+    // contentBase: join(dirname(fileURLToPath(import.meta.url)), "public"),
+    static: './public',
   }
 }

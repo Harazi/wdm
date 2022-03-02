@@ -28,7 +28,7 @@ export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
 
         <div className="base-name label-input-pair">
           <label htmlFor="base-name">File name</label>
-          <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} />
+          <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} autoFocus />
         </div>
 
         <div className="dot">
@@ -42,14 +42,14 @@ export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
         
       </div>
 
-      <div className="download-options">
+      {/* <div className="download-options">
 
         <div className="download-parts label-input-pair">
           <label htmlFor="parts">Download parts (disabled)</label>
           <input type="number" id="parts" defaultValue={8} max={8} min={1} />
         </div>
 
-      </div>
+      </div> */}
 
       <div className="controll-buttons">
 

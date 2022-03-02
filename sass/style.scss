@@ -1,14 +1,15 @@
 @use "general";
 @use "get-dir-handle";
 @use "interface";
-@use "aside";
-@use "main";
-@use "popup";
-@use "popups";
+@use "aside/aside";
+@use "main/main";
+@use "popup/popup";
+@use "popup/popups";
 
 :root {
   --html-font-size: 1.3rem;
   --background-color: #f0f8ff;
+  --secondary-background-color: rgb(0, 120, 120);
 }
 
 html {

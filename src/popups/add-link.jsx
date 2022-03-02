@@ -1,92 +1,114 @@
 import React from "react"
 import NewFileDialog from "./new-file-dialog.jsx"
 
+function reducer(state, action) {
+  switch (action.type) {
+
+    case "LOADING":
+      return {
+        className: "loading",
+        errorMessage: false
+      }
+
+    case "INVALID_URL":
+      return {
+        className: "",
+        errorMessage: "That's invalid url. Please check again"
+      }
+
+    case "FAILED_FETCHING": {
+      console.error(action.error)
+      return {
+        className: "",
+        errorMessage: "Failed connecting to the server"
+      }
+    }
+
+    case "UNEXPECTED_STATUS_CODE":
+      return {
+        className: "",
+        errorMessage: `Unexpected status code: ${action.status}`
+      }
+  
+    default:
+      throw new TypeError(`Unkonwn action type: ${action.type}`)
+  }
+}
+
+const initialState = {
+  className: "",
+  errorMessage: false
+}
+
 export default function AddLink({ makePopup, addNewDownlaod }) {
 
-  const [additionalClasses, useAdditionalClasses] = React.useState("")
-
-  const [errorMessage, useErrorMessage] = React.useState(false)
-  
-  const errorsList = {
-    invalidUrl: "That's invalid url. Please check again",
-    unknown: "Something is wrong, Please try again"
-  }
-
-  // Doesn't work. race condition?
-  // React.useEffect(() => useAdditionalClasses(""), [errorMessage])
-  function changeState(errorState = false, classState = "") {
-    useErrorMessage(errorState)
-    useAdditionalClasses(classState)
-  }
+  const [state, dispatch] = React.useReducer(reducer, initialState)
 
   async function connect(e) {
 
-    // useErrorMessage(false)
-    // useAdditionalClasses("loading")
-    changeState(false, "loading")
+    dispatch({ type: "LOADING" })
 
     try {
 
       var { href } = new URL(e.target.previousElementSibling.value)
 
     } catch (error) {
-      // useErrorMessage(errorsList[error instanceof TypeError ? "invalidUrl" : "unknown"])
-      // useAdditionalClasses("")
-      changeState(errorsList[error instanceof TypeError ? "invalidUrl" : "unknown"])
-      return
+
+      return dispatch({ type: "INVALID_URL" })
+
     }
+
+    const abortController = new AbortController()
 
     try {
 
       var res = await fetch('http://localhost:5000/api/get', {
+        redirect: "manual",
+        cache: "no-store",
+        referrer: "",
         headers: {
           'x-wdm': href,
-          // range: "bytes=0-"
-        }
+        },
+        signal: abortController.signal,
       })
       
     } catch (error) {
-      // useErrorMessage(error.toString())
-      // useAdditionalClasses("")
-      changeState(error.toString())
-      return
+
+      return dispatch({ type: "FAILED_FETCHING", error })
+
     }
 
-    console.dir(res)
-    for (const [header, val] of res.headers.entries()) {
-      console.log(header, ":", val)
-    }
-
+    // Got the headers, no need for the body
+    abortController.abort()
 
     if (!(res.status === 200 || res.status === 206))
-      // return useErrorMessage(`Server Respond with status code ${res.status}`)
-      return changeState(`Server Respond with status code ${res.status}`)
+      return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    makePopup(<NewFileDialog url={href} makePopup={makePopup} addNewDownlaod={addNewDownlaod} />)
+    console.log(Object.fromEntries(res.headers.entries()))
+
+    makePopup(
+      <NewFileDialog
+        url={res.headers.get("x-wdm-finalurl")}
+        makePopup={makePopup}
+        addNewDownlaod={addNewDownlaod} />,
+      "File information"
+    )
 
   }
 
   return (
     <div className="add-link">
 
-      <div className={"inputs " + additionalClasses}>
-        <input type="url" placeholder="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" disabled={additionalClasses.includes("loading")} />
-        <button type="button" onClick={connect} disabled={additionalClasses.includes("loading")}>Connect</button>
+      <div className={`inputs ${state.className}`}>
+        <input type="url" autoFocus placeholder="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" disabled={state.className === "loading"} />
+        <button type="button" onClick={connect} disabled={state.className === "loading"}>Connect</button>
       </div>
 
-      {errorMessage &&
+      {state.errorMessage &&
       <div className="error-displayer">
-        <p>{errorMessage}</p>
+        <p>{state.errorMessage}</p>
       </div>}
 
     </div>
   )
 }
-
-// function verifyResponse(res) {
-//   if (res)
-// }
-
-// function acceptRange(res) {
-//   if (res.headers.get("range"))
-// }
