@@ -152,12 +152,15 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
         <button type="button" className="play"></button>
       </div> */}
 
-      <div className="controll-button">
-        <button type="button" className="cancel" onClick={() => removeDownloadEntry(id)}>
-          <img src="icons/delete-forever_white_hq_18dp.png" alt="Delete Icon" />
-          Cancel
-        </button>
-      </div>
+      {
+        !state.finished &&
+        <div className="controll-button">
+          <button type="button" className="cancel" onClick={() => removeDownloadEntry(id)}>
+            <img src="icons/delete-forever_white_hq_18dp.png" alt="Delete Icon" />
+            Cancel
+          </button>
+        </div>
+      }
     </li>
   )
 }
