@@ -62,7 +62,7 @@ export default function AddLink({ makePopup, addNewDownlaod }) {
 
     try {
 
-      var res = await fetch('http://localhost:5000/api/get', {
+      var res = await fetch("api/get", {
         redirect: "manual",
         cache: "no-store",
         referrer: "",

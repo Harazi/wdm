@@ -81,7 +81,7 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
       const fileWriteable = await fileHandle.createWritable({ keepExistingData: true })
   
   
-      const res = await fetch("http://localhost:5000/api/get", {
+      const res = await fetch("api/get", {
         redirect: "manual",
         cache: "no-store",
         referrer: "",
