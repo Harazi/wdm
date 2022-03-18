@@ -2,9 +2,11 @@ import express from "express"
 import range from "@ceicc/range"
 import http from "node:http"
 import https from "node:https"
-import { URL } from "node:url"
+import { URL, fileURLToPath } from "node:url"
+import { dirname } from "node:path"
 
-const router = express.Router()
+const router = express.Router({ strict: true })
+
 
 router.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "x-wdm")
@@ -38,7 +40,7 @@ router.get('/api/get', (req, res) => {
   })
 })
 
-router.get('*', range({ baseDir: 'public' }))
+router.get('*', range({ baseDir: dirname(fileURLToPath(import.meta.url)) + '/public' }))
 
 
 export default router
