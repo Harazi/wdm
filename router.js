@@ -1,11 +1,13 @@
 import express from "express"
 import range from "@ceicc/range"
-import http from "node:http"
-import https from "node:https"
-import { URL, fileURLToPath } from "node:url"
-import { dirname } from "node:path"
+import http from "http"
+import https from "https"
+import { URL, fileURLToPath } from "url"
+import { dirname } from "path"
 
 const router = express.Router({ strict: true })
+
+export default router
 
 
 router.use((req, res, next) => {
@@ -18,8 +20,6 @@ router.get('/api/get', (req, res) => {
 
   const href = req.headers["x-wdm"]
 
-  //// console.log("new api request to: ", href)
-
   if (!href)
     return res.sendStatus(404)
 
@@ -27,23 +27,19 @@ router.get('/api/get', (req, res) => {
 
 
   requestPage(href, req.headers, serverRes => {
-  //// proxyRequestPage(href, req.headers, serverRes => {
 
     res.writeHead(serverRes.statusCode, serverRes.statusMessage, serverRes.headers)
     serverRes.pipe(res)
 
   }, error => {
 
-    //// console.error(error)
+    // console.error(error)
     !res.headersSent && res.sendStatus(500)
 
   })
 })
 
 router.get('*', range({ baseDir: dirname(fileURLToPath(import.meta.url)) + '/public' }))
-
-
-export default router
 
 
 function requestPage(href, headers, cb, errorCb) {
