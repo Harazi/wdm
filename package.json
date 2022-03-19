@@ -2,11 +2,11 @@
   "name": "wdm",
   "version": "1.0.0",
   "description": "Web Download Manager",
-  "main": "src/app.jsx",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "nodemon server.js",
-    "dev": "webpack --mode development --watch",
+    "dev": "webpack --watch",
     "build": "webpack --mode production"
   },
   "keywords": [
