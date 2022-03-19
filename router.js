@@ -39,7 +39,10 @@ router.get('/api/get', (req, res) => {
   })
 })
 
-router.get('*', range({ baseDir: dirname(fileURLToPath(import.meta.url)) + '/public' }))
+router.get('*', range({
+  baseDir: dirname(fileURLToPath(import.meta.url)) + '/public',
+  maxAge: process.env.DEVELOPMENT ? 0 : 86400
+}))
 
 
 function requestPage(href, headers, cb, errorCb) {
