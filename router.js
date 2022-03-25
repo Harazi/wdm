@@ -39,6 +39,16 @@ router.get('/api/get', (req, res) => {
   })
 })
 
+router.get('/api/youtube', (req, res) => {
+
+  const { id } = req.query
+
+  if (!isValidYoutubeID(id))
+    return res.sendStatus(400)
+
+  res.status(201).json({ test: true })
+})
+
 router.get('*', range({
   baseDir: dirname(fileURLToPath(import.meta.url)) + '/public',
   maxAge: process.env.DEVELOPMENT ? 0 : 86400
@@ -88,4 +98,8 @@ function requestPage(href, headers, cb, errorCb) {
     cb(res)
   }
 
+}
+
+function isValidYoutubeID(id) {
+  return typeof id === "string" && id.match(/^[a-zA-Z0-9_-]{11}$/)
 }
