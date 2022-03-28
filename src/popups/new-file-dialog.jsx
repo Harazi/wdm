@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
+export default function newFileDialog({ url, makePopup, addNewDownload }) {
 
   const fileNameInput = React.useRef(),
         extensionInput = React.useRef()
@@ -11,7 +11,7 @@ export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
 
     console.log(url, name)
 
-    addNewDownlaod(url, name)
+    addNewDownload(url, name)
 
     makePopup(false)
   }
@@ -39,7 +39,7 @@ export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
           <label htmlFor="extension">File extension</label>
           <input type="text" id="extension" placeholder="jpg" ref={extensionInput} />
         </div>
-        
+
       </div>
 
       {/* <div className="download-options">
@@ -62,7 +62,7 @@ export default function newFileDialog({ url, makePopup, addNewDownlaod }) {
         </div>
 
       </div>
-      
+
     </div>
   )
 }
