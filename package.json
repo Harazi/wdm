@@ -19,7 +19,8 @@
   "dependencies": {
     "@ceicc/range": "^3.0.0-beta.1",
     "axios": "^0.26.1",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "mime-types": "^2.1.35"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",
