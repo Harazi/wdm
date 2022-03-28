@@ -1,5 +1,5 @@
 import React from "react"
-import youtubeFile from "./youtube-file.jsx"
+import YoutubeFile from "./youtube-file.jsx"
 
 function reducer(state, action) {
   switch (action.type) {
@@ -50,7 +50,7 @@ function isValidYoutubeURL(url) {
 }
 
 
-export default function youtubeLink({ makePopup, addNewDownlaod }) {
+export default function YoutubeLink({ makePopup, addNewDownlaod }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -85,10 +85,10 @@ export default function youtubeLink({ makePopup, addNewDownlaod }) {
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
     makePopup(
-      <youtubeFile
+      <YoutubeFile
         details={details}
         makePopup={makePopup}
-        addNewDownlaod={addNewDownlaod} />,
+        addNewDownload={addNewDownlaod} />,
       "Video information"
     )
 
