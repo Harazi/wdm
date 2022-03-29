@@ -29,7 +29,7 @@ function reducer(state, action) {
         className: "",
         errorMessage: `Unexpected status code: ${action.status}`
       }
-  
+
     default:
       throw new TypeError(`Unkonwn action type: ${action.type}`)
   }
@@ -40,7 +40,7 @@ const initialState = {
   errorMessage: false
 }
 
-export default function AddLink({ makePopup, addNewDownlaod }) {
+export default function AddLink({ makePopup, addNewDownload }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -71,7 +71,7 @@ export default function AddLink({ makePopup, addNewDownlaod }) {
         },
         signal: abortController.signal,
       })
-      
+
     } catch (error) {
 
       return dispatch({ type: "FAILED_FETCHING", error })
@@ -90,7 +90,7 @@ export default function AddLink({ makePopup, addNewDownlaod }) {
       <NewFileDialog
         url={res.headers.get("x-wdm-finalurl")}
         makePopup={makePopup}
-        addNewDownlaod={addNewDownlaod} />,
+        addNewDownload={addNewDownload} />,
       "File information"
     )
 

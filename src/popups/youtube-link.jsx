@@ -50,7 +50,7 @@ function isValidYoutubeURL(url) {
 }
 
 
-export default function YoutubeLink({ makePopup, addNewDownlaod }) {
+export default function YoutubeLink({ makePopup, addNewDownload }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -88,7 +88,7 @@ export default function YoutubeLink({ makePopup, addNewDownlaod }) {
       <YoutubeFile
         details={details}
         makePopup={makePopup}
-        addNewDownload={addNewDownlaod} />,
+        addNewDownload={addNewDownload} />,
       "Video information"
     )
 

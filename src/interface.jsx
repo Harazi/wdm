@@ -25,7 +25,7 @@ export default function Interface() {
 
   const [downloadList, setDownloadList] = React.useState([])
 
-  function addNewDownlaod(url, name) {
+  function addNewDownload(url, name) {
     // TODO: save the download state in the list
     // TODO: save the list in localstorage
     setDownloadList([
@@ -46,15 +46,15 @@ export default function Interface() {
 
   return (
     <div className="main-container">
-    
+
       {/* {isDesktop
       ? <Aside> <Nav /> </Aside>
       : <Header> <Nav /> </Header>} */}
 
-      <Aside makePopup={makePopup} addNewDownlaod={addNewDownlaod} />
+      <Aside makePopup={makePopup} addNewDownload={addNewDownload} />
 
       <Main downloadList={downloadList} removeDownloadEntry={removeDownloadEntry} />
-      
+
       {displayPopup &&
       <Popup
         closeFn={closePopup}

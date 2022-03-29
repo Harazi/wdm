@@ -1,7 +1,7 @@
 import React from "react"
 import Nav from "./nav.jsx"
 
-export default function Aside({ makePopup, addNewDownlaod }) {
+export default function Aside({ makePopup, addNewDownload }) {
   return (
     <aside>
       <h1 className="app-name">Web Download Manager</h1>
@@ -9,7 +9,7 @@ export default function Aside({ makePopup, addNewDownlaod }) {
         <img src="icons/download-from-cloud_550.png" alt="Keyboard Chair" />
       </div>
 
-      <Nav makePopup={makePopup} addNewDownlaod={addNewDownlaod} />
+      <Nav makePopup={makePopup} addNewDownload={addNewDownload} />
 
     </aside>
   )
