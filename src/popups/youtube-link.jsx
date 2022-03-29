@@ -97,13 +97,15 @@ export default function YoutubeLink({ makePopup, addNewDownload }) {
   return (
     <div className="youtube-link">
 
-      <div className="label-input-pair">
-        <label htmlFor="youtube-link">Youtube link or video ID</label>
-        <input type="text" id="youtube-link" ref={youtubeURL} disabled={state.isLoading} />
-      </div>
+      <div className="main-inputs">
+        <div className="label-input-pair">
+          <label htmlFor="youtube-link">Youtube link or video ID</label>
+          <input type="text" id="youtube-link" ref={youtubeURL} disabled={state.isLoading} />
+        </div>
 
-      <div className="confirm">
-        <button type="button" onClick={connect} disabled={state.isLoading}>Connect</button>
+        <div className="confirm">
+          <button type="button" onClick={connect} disabled={state.isLoading}>Connect</button>
+        </div>
       </div>
 
       {state.errorMessage &&
