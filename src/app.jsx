@@ -27,9 +27,9 @@ function App() {
       window.downloadDirHandle = await showDirectoryPicker({ startIn: "downloads" })
 
       // Get read/write permissions
-      await window.downloadDirHandle.getFileHandle("wdm", { create: true })
-      await window.downloadDirHandle.removeEntry("wdm")
-      
+      await window.downloadDirHandle.getFileHandle(".wdm", { create: true })
+      await window.downloadDirHandle.removeEntry(".wdm")
+
       setDownloadDirHandle(window.downloadDirHandle)
     } catch (error) {
       console.error(error)
