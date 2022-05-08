@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "env DEVELOPMENT=true nodemon server.js",
-    "dev": "webpack --watch",
-    "build": "webpack --mode production"
+    "build": "npm run sass-build && npm run webpack-build",
+    "webpack-watch": "webpack --watch",
+    "webpack-build": "webpack --mode production",
+    "sass-watch": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map --watch",
+    "sass-build": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map"
   },
   "keywords": [
     "Download",
@@ -28,6 +31,7 @@
     "nodemon": "^2.0.15",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "sass": "^1.51.0",
     "webpack": "^5.69.0",
     "webpack-cli": "^4.9.2"
   }
