@@ -1,6 +1,5 @@
 import React from "react"
 import YoutubeFile from "./youtube-file.jsx"
-import modularContext from '../context/modularContext.jsx'
 
 function reducer(state, action) {
   switch (action.type) {
@@ -51,9 +50,7 @@ function isValidYoutubeURL(url) {
 }
 
 
-export default function YoutubeLink({ addNewDownload }) {
-
-  const modularState = React.useContext(modularContext)
+export default function YoutubeLink({ makePopup, addNewDownload }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -87,14 +84,13 @@ export default function YoutubeLink({ addNewDownload }) {
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    modularState.makeModular({
-      title: "Video information",
-      render: (
-        <YoutubeFile
-          details={details}
-          addNewDownload={addNewDownload} />
-      )
-    })
+    makePopup(
+      <YoutubeFile
+        details={details}
+        makePopup={makePopup}
+        addNewDownload={addNewDownload} />,
+      "Video information"
+    )
 
   }
 

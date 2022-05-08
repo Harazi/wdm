@@ -1,18 +1,32 @@
 import React from "react"
+// import Header from "./header.jsx"
 import Aside from "./aside/aside.jsx"
 import Main from "./main/main.jsx"
 import Popup from "./popup.jsx"
-import modularContext from './context/modularContext.jsx'
 
 export default function Interface() {
 
-  const modularState = React.useContext(modularContext)
+  // const [isDesktop, useIsDesktop] = React.useState(window.outerWidth > 1000)
 
+  // React.useEffect(() => addEventListener("resize", () => useIsDesktop(window.outerWidth > 1000)), [])
+
+  const [displayPopup, setDisplayPopup] = React.useState(false)
+  const [popupTitle, setPopupTitle] = React.useState("")
+
+  function makePopup(component, title) {
+    setDisplayPopup(component)
+    setPopupTitle(title)
+  }
+
+  function closePopup() {
+    setDisplayPopup(false)
+    setPopupTitle("")
+  }
 
   const [downloadList, setDownloadList] = React.useState([])
 
   function addNewDownload(url, name) {
-    // TODO: save the download progress in the list
+    // TODO: save the download state in the list
     // TODO: save the list in localstorage
     setDownloadList([
       ...downloadList,
@@ -33,17 +47,19 @@ export default function Interface() {
   return (
     <div className="main-container">
 
-      <Aside addNewDownload={addNewDownload} />
+      {/* {isDesktop
+      ? <Aside> <Nav /> </Aside>
+      : <Header> <Nav /> </Header>} */}
+
+      <Aside makePopup={makePopup} addNewDownload={addNewDownload} />
 
       <Main downloadList={downloadList} removeDownloadEntry={removeDownloadEntry} />
 
-      {modularState.Modular && (
-
-        <Popup title={modularState.Modular.title} closeMethod={modularState.Modular.closeMethod} >
-            {modularState.Modular.render}
-        </Popup>
-
-      )}
+      {displayPopup &&
+      <Popup
+        closeFn={closePopup}
+        title={popupTitle}
+        children={displayPopup} />}
 
     </div>
   )

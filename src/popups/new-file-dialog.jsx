@@ -1,9 +1,6 @@
 import React from "react"
-import modularContext from '../context/modularContext.jsx'
 
-export default function newFileDialog({ url, addNewDownload }) {
-
-  const modularState = React.useContext(modularContext)
+export default function newFileDialog({ url, makePopup, addNewDownload }) {
 
   const fileNameInput = React.useRef(),
         extensionInput = React.useRef()
@@ -16,7 +13,7 @@ export default function newFileDialog({ url, addNewDownload }) {
 
     addNewDownload(url, name)
 
-    modularState.makeModular(false)
+    makePopup(false)
   }
 
   return (
@@ -57,7 +54,7 @@ export default function newFileDialog({ url, addNewDownload }) {
       <div className="controll-buttons">
 
         <div className="button-container cancel">
-          <button type="button" onClick={() => modularState.makeModular(false)}>Cancel</button>
+          <button type="button" onClick={() => makePopup(false)}>Cancel</button>
         </div>
 
         <div className="button-container start">

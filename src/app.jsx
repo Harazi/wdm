@@ -2,7 +2,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 import GetDirHandle from "./get-dir-handle.jsx"
 import Interface from "./interface.jsx"
-import { ModularProvider } from './context/modularContext.jsx'
 
 window._wdmConfig = {
   scraperProxy: {
@@ -40,7 +39,7 @@ function App() {
   }
 
   return downloadDirHandle
-    ? <ModularProvider> <Interface /> </ModularProvider>
+    ? <Interface />
     : ("showDirectoryPicker" in window)
     ? <GetDirHandle onclick={selectDownloadDirectory} />
     : <p>
