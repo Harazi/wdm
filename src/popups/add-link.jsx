@@ -1,5 +1,6 @@
 import React from "react"
 import NewFileDialog from "./new-file-dialog.jsx"
+import modularContext from '../context/modularContext.jsx'
 
 function reducer(state, action) {
   switch (action.type) {
@@ -40,7 +41,9 @@ const initialState = {
   errorMessage: false
 }
 
-export default function AddLink({ makePopup, addNewDownload }) {
+export default function AddLink({ addNewDownload }) {
+
+  const modularState = React.useContext(modularContext)
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -86,13 +89,14 @@ export default function AddLink({ makePopup, addNewDownload }) {
 
     console.log(Object.fromEntries(res.headers.entries()))
 
-    makePopup(
-      <NewFileDialog
-        url={res.headers.get("x-wdm-finalurl")}
-        makePopup={makePopup}
-        addNewDownload={addNewDownload} />,
-      "File information"
-    )
+    modularState.makeModular({
+      title: "File information",
+      render: (
+        <NewFileDialog
+          url={res.headers.get("x-wdm-finalurl")}
+          addNewDownload={addNewDownload} />
+      )
+    })
 
   }
 

@@ -1,6 +1,7 @@
 import React from "react"
+import modularContext from '../context/modularContext.jsx'
 
-export default function youtubeFile({ makePopup, addNewDownload, details }) {
+export default function youtubeFile({ addNewDownload, details }) {
 
   const detailsDummy = {
     author: "Kick-Tube TV",
@@ -30,6 +31,8 @@ export default function youtubeFile({ makePopup, addNewDownload, details }) {
     ]
   }
 
+  const modularState = React.useContext(modularContext)
+
   const [videoFormat, setVideoFormat] = React.useState(0)
 
   const videoFileNameInput = React.useRef()
@@ -42,7 +45,7 @@ export default function youtubeFile({ makePopup, addNewDownload, details }) {
 
     addNewDownload(details.formats[videoFormat].url, fileName)
 
-    makePopup(false)
+    modularState.makeModular(false)
   }
 
   return (
@@ -57,7 +60,7 @@ export default function youtubeFile({ makePopup, addNewDownload, details }) {
         <div className="text-container">
 
           <div className="title-author">
-            <p className="title">{details.title}</p>
+            <p className="title" title={details.title}>{details.title}</p>
             <span className="author">By <em>{details.author}</em></span>
           </div>
 
@@ -92,7 +95,7 @@ export default function youtubeFile({ makePopup, addNewDownload, details }) {
 
           <div className="base-name label-input-pair">
             <label htmlFor="base-name">Video name</label>
-            <input type="text" id="base-name" placeholder="Parkour Compilation" ref={videoFileNameInput}/>
+            <input type="text" id="base-name" defaultValue={details.title} ref={videoFileNameInput}/>
           </div>
 
           <div className="dot">
@@ -110,7 +113,7 @@ export default function youtubeFile({ makePopup, addNewDownload, details }) {
       <div className="controll-buttons">
 
         <div className="button-container cancel">
-          <button type="button" onClick={() => makePopup(false)}>Cancel</button>
+          <button type="button" onClick={() => modularState.makeModular(false)}>Cancel</button>
         </div>
 
         <div className="button-container start">

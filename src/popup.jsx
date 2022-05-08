@@ -1,10 +1,10 @@
 import React from "react"
 
-export default function Popup({ children, title, closeFn }) {
+export default function Popup({ children, title, closeMethod }) {
 
   function click(e) {
     if (e.target.closest(".popup-box")) return
-    else closeFn(e)
+    else closeMethod(e)
   }
 
   return (
@@ -17,9 +17,9 @@ export default function Popup({ children, title, closeFn }) {
           <div className="title" title={title}>
             <p>{title}</p>
           </div>
-          
+
           <div className="close-button">
-            <button type="button" onClick={closeFn}></button>
+            <button type="button" onClick={closeMethod}></button>
           </div>
 
         </div>
@@ -31,7 +31,7 @@ export default function Popup({ children, title, closeFn }) {
         </section>
 
       </div>
-      
+
     </div>
   )
 }
