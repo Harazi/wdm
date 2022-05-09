@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import GetDirHandle from "./get-dir-handle.jsx"
-import Interface from "./interface.jsx"
+import GetDirHandle from "./get-dir-handle"
+import Interface from "./interface"
 
 window._wdmConfig = {
   scraperProxy: {

@@ -1,5 +1,5 @@
 import React from "react"
-import NewFileDialog from "./new-file-dialog.jsx"
+import NewFileDialog from "./new-file-dialog"
 
 function reducer(state, action) {
   switch (action.type) {

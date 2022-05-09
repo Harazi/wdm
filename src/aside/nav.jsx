@@ -1,6 +1,6 @@
 import React from "react"
-import AddLink from "../popups/add-link.jsx"
-import YoutubeLink from "../popups/youtube-link.jsx"
+import AddLink from "../popups/add-link"
+import YoutubeLink from "../popups/youtube-link"
 
 export default function Nav({ makePopup, addNewDownload }) {
   return (

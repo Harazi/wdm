@@ -27,6 +27,10 @@ export default {
     ]
   },
 
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
+
   devServer: {
     port: 8080,
     // contentBase: join(dirname(fileURLToPath(import.meta.url)), "public"),

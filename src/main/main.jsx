@@ -1,5 +1,5 @@
 import React from "react"
-import DownloadEntry from "./downlaod-entry.jsx"
+import DownloadEntry from "./downlaod-entry"
 
 export default function Main({ downloadList, removeDownloadEntry }) {
   return (

@@ -1,8 +1,8 @@
 import React from "react"
-// import Header from "./header.jsx"
-import Aside from "./aside/aside.jsx"
-import Main from "./main/main.jsx"
-import Popup from "./popup.jsx"
+// import Header from "./header"
+import Aside from "./aside/aside"
+import Main from "./main/main"
+import Popup from "./popup"
 
 export default function Interface() {
 
