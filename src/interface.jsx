@@ -1,14 +1,9 @@
 import React from "react"
-// import Header from "./header"
 import Aside from "./aside/aside"
 import Main from "./main/main"
 import Popup from "./popup"
 
 export default function Interface() {
-
-  // const [isDesktop, useIsDesktop] = React.useState(window.outerWidth > 1000)
-
-  // React.useEffect(() => addEventListener("resize", () => useIsDesktop(window.outerWidth > 1000)), [])
 
   const [displayPopup, setDisplayPopup] = React.useState(false)
   const [popupTitle, setPopupTitle] = React.useState("")
@@ -46,10 +41,6 @@ export default function Interface() {
 
   return (
     <div className="main-container">
-
-      {/* {isDesktop
-      ? <Aside> <Nav /> </Aside>
-      : <Header> <Nav /> </Header>} */}
 
       <Aside makePopup={makePopup} addNewDownload={addNewDownload} />
 
