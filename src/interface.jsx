@@ -1,6 +1,6 @@
 import React from "react"
 import Aside from "./aside/aside"
-import Main from "./main/main"
+import Main from "./main"
 import Popup from "./popup"
 
 export default function Interface({ downloadDirHandle }) {
@@ -22,9 +22,11 @@ export default function Interface({ downloadDirHandle }) {
   const addNewDownload = React.useCallback((url, name) => {
     // TODO: save the download state in the list
     // TODO: save the list in localstorage
-    setDownloadList([
-      ...downloadList,
+    setDownloadList(list => [
+      ...list,
       {
+        //! `String.toString` doesn't accept any parameter
+        //! I've mistaken it with `Number.toString`
         id: `${url.toString(32)}-${name.toString(32)}`,
         url,
         name
@@ -41,15 +43,15 @@ export default function Interface({ downloadDirHandle }) {
   return (
     <div className="main-container">
 
-      <Aside makePopup={makePopup} addNewDownload={addNewDownload} />
+      <Aside {...{makePopup, addNewDownload}} />
 
-      <Main downloadList={downloadList} removeDownloadEntry={removeDownloadEntry} downloadDirHandle={downloadDirHandle} />
+      <Main {...{downloadList, removeDownloadEntry, downloadDirHandle}} />
 
       {displayPopup &&
       <Popup
         closeFn={closePopup}
         title={popupTitle}
-        children={displayPopup} />}
+        render={displayPopup} />}
 
     </div>
   )
