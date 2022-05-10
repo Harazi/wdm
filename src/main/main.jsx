@@ -1,7 +1,7 @@
 import React from "react"
 import DownloadEntry from "./downlaod-entry"
 
-export default function Main({ downloadList, removeDownloadEntry }) {
+export default function Main({ downloadList, removeDownloadEntry, downloadDirHandle }) {
   return (
     <main>
 
@@ -16,7 +16,8 @@ export default function Main({ downloadList, removeDownloadEntry }) {
                   id={downloadObj.id}
                   url={downloadObj.url}
                   name={downloadObj.name}
-                  removeDownloadEntry={removeDownloadEntry} />
+                  removeDownloadEntry={removeDownloadEntry}
+                  downloadDirHandle={downloadDirHandle} />
               ))}
 
             </ul>

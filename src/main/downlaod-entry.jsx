@@ -12,7 +12,7 @@ function reducer(state, action) {
         return {
           ...state,
           fileSize: size,
-        }      
+        }
     }
 
     case "START":
@@ -20,7 +20,7 @@ function reducer(state, action) {
         ...state,
         startTime: Date.now()
       }
-  
+
     case "INCOMING_CHUNK":
       return {
         ...state,
@@ -60,7 +60,7 @@ const initialState = {
   progress: 0
 }
 
-export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
+export default function DownloadEntry({ id, url, name, removeDownloadEntry, downloadDirHandle }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -74,13 +74,13 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
     window.aborter = abortController
 
     ;(async () => {
-      
-      const fileHandle = await window.downloadDirHandle.getFileHandle(name, { create: true })
-  
+
+      const fileHandle = await downloadDirHandle.getFileHandle(name, { create: true })
+
       // Currently Chrome will ignore `keepExistingData` option
       const fileWriteable = await fileHandle.createWritable({ keepExistingData: true })
-  
-  
+
+
       const res = await fetch("api/get", {
         redirect: "manual",
         cache: "no-store",
@@ -98,7 +98,7 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
       dispatch({ type: "START" })
 
       while(true) {
-        
+
         const { done, value } = await reader.read()
 
         if (done) {
@@ -146,7 +146,7 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry }) {
           || <progress></progress>
         }
       </div>
-      
+
       {/* TODO: add a pause/resume button */}
       {/* <div className="controll-button">
         <button type="button" className="play"></button>
