@@ -3,10 +3,10 @@ import { fileURLToPath } from "node:url"
 
 export default {
 
-  entry: "./src/App.jsx",
+  entry: "./src/index.jsx",
 
   output: {
-    path: join(dirname(fileURLToPath(import.meta.url)), "public/js"),
+    path: join(dirname(fileURLToPath(import.meta.url)), "public", "js"),
     filename: "bundle.js"
   },
 

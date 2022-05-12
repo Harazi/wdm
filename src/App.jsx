@@ -1,10 +1,9 @@
 import React from "react"
-import ReactDOM from "react-dom"
 import GetDirHandle from "./GetDirHandle"
 import Interface from "./Interface"
 
 
-function App() {
+export default function App() {
 
   const [downloadDirHandle, setDownloadDirHandle] = React.useState(false)
 
@@ -42,6 +41,3 @@ function App() {
         to Access this website
       </p>
 }
-
-
-ReactDOM.render(<App />, document.querySelector("#react-root"))
