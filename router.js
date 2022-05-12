@@ -91,7 +91,7 @@ router.get('/api/youtube', async (req, res) => {
 
 router.get('*', range({
   baseDir: dirname(fileURLToPath(import.meta.url)) + '/public',
-  maxAge: process.env.DEVELOPMENT ? 0 : 86400
+  maxAge: process.env.NODE_ENV === "production" ? 86400 : 0
 }))
 
 

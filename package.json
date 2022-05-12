@@ -5,9 +5,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "env DEVELOPMENT=true nodemon server.js",
-    "dev": "npm-run-all -p webpack-watch sass-watch",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "npm-run-all -p nodemon webpack-watch sass-watch",
     "build": "npm run sass-build && npm run webpack-build",
+    "nodemon": "nodemon server.js",
     "webpack-watch": "webpack --watch",
     "webpack-build": "webpack --mode production",
     "sass-watch": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map --watch",
