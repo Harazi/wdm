@@ -1,0 +1,29 @@
+/* nunito-regular - latin */
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''),
+    url('../fonts/nunito/nunito-v24-latin-regular.woff2') format('woff2');
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+}
+
+/* nunito-italic - latin */
+@font-face {
+  font-family: 'Nunito';
+  font-style: italic;
+  font-weight: 400;
+  src: local(''),
+    url('../fonts/nunito/nunito-v24-latin-italic.woff2') format('woff2');
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+}
+
+/* rock-salt-regular - latin */
+@font-face {
+  font-family: 'Rock Salt';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''),
+    url('../fonts/rock-salt/rock-salt-v18-latin-regular.woff2') format('woff2');
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+}
