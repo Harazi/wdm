@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function newFileDialog({ url, makePopup, addNewDownload }) {
+export default function NewFileDialog({ url, makePopup, addNewDownload }) {
 
   const fileNameInput = React.useRef(),
         extensionInput = React.useRef()

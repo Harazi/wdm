@@ -1,7 +1,7 @@
 import React from "react"
-import Nav from "./nav"
-import AddLink from "../popups/add-link"
-import YoutubeLink from "../popups/youtube-link"
+import Nav from "./Nav"
+import AddLink from "../popups/AddLink"
+import YoutubeLink from "../popups/YoutubeLink"
 
 export default React.memo(function Aside({ makePopup, addNewDownload }) {
   return (

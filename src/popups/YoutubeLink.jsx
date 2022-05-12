@@ -1,5 +1,5 @@
 import React from "react"
-import YoutubeFile from "./youtube-file"
+import YoutubeFile from "./YoutubeFile"
 
 function reducer(state, action) {
   switch (action.type) {

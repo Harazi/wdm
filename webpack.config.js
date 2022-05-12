@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url"
 
 export default {
 
-  entry: "./src/app.jsx",
+  entry: "./src/App.jsx",
 
   output: {
     path: join(dirname(fileURLToPath(import.meta.url)), "public/js"),

@@ -1,7 +1,7 @@
 import React from "react"
-import Aside from "./aside/aside"
-import Main from "./main"
-import Popup from "./popup"
+import Aside from "./aside/Aside"
+import Main from "./Main"
+import Popup from "./Popup"
 
 export default function Interface({ downloadDirHandle }) {
 

@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function youtubeFile({ makePopup, addNewDownload, details }) {
+export default function YoutubeFile({ makePopup, addNewDownload, details }) {
 
   const detailsDummy = {
     author: "Kick-Tube TV",

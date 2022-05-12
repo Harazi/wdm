@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import GetDirHandle from "./get-dir-handle"
-import Interface from "./interface"
+import GetDirHandle from "./GetDirHandle"
+import Interface from "./Interface"
 
 
 function App() {
