@@ -16,7 +16,7 @@
     gap: 5px;
     background-color: var(--background-color);
     border-radius: 0.7em;
-    animation: popup 0.2s ease;
+    animation: popup 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53); // In · Quadratic
 
     .titlebar {
       display: grid;
@@ -53,9 +53,11 @@
 
 @keyframes popup {
   from {
-    transform: scale(0.5)
+    opacity: 0;
+    transform: translateY(-15px)
   }
   to {
-    transform: scale(1)
+    opacity: 1;
+    transform: translateY(0)
   }
 }
