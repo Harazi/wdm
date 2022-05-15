@@ -5,9 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node server.js",
-    "dev": "npm-run-all -p nodemon webpack-watch sass-watch",
-    "build": "npm run sass-build && npm run webpack-build",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=development npm-run-all -p nodemon webpack-watch sass-watch",
+    "build": "cross-env NODE_ENV=production npm run sass-build && npm run webpack-build",
     "nodemon": "nodemon server.js",
     "webpack-watch": "webpack --watch",
     "webpack-build": "webpack --mode production",
@@ -24,6 +24,7 @@
   "dependencies": {
     "@ceicc/range": "^3.0.0-beta.1",
     "axios": "^0.26.1",
+    "cross-env": "^7.0.3",
     "express": "^4.17.3",
     "mime-types": "^2.1.35"
   },
