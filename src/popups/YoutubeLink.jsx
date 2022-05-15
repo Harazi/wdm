@@ -54,13 +54,13 @@ export default function YoutubeLink({ makePopup, addNewDownload }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
-  const youtubeURL = React.useRef()
+  const URLInput = React.useRef()
 
   async function connect() {
 
     dispatch({ type: "LOADING" })
 
-    const id = isValidYoutubeURL(youtubeURL.current.value)
+    const id = isValidYoutubeURL(URLInput.current.value)
 
     if (!id)
       return dispatch({ type: "INVALID_LINK" })
@@ -95,12 +95,18 @@ export default function YoutubeLink({ makePopup, addNewDownload }) {
   }
 
   return (
-    <div className="youtube-link">
+    <div className="connect-to-url">
 
       <div className="main-inputs">
         <div className="label-input-pair">
-          <label htmlFor="youtube-link">Youtube link or video ID</label>
-          <input type="text" id="youtube-link" ref={youtubeURL} disabled={state.isLoading} />
+          <label htmlFor="URL-input">Youtube link or video ID</label>
+          <input
+            type="text"
+            id="URL-input"
+            ref={URLInput}
+            disabled={state.isLoading}
+            placeholder={"youtu.be/Sklc_fQBmcs"}
+            autoFocus />
         </div>
 
         <div className="confirm">

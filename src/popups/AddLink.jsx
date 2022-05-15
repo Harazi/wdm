@@ -6,27 +6,27 @@ function reducer(state, action) {
 
     case "LOADING":
       return {
-        className: "loading",
+        isLoading: true,
         errorMessage: false
       }
 
     case "INVALID_URL":
       return {
-        className: "",
+        isLoading: false,
         errorMessage: "That's invalid url. Please check again"
       }
 
     case "FAILED_FETCHING": {
       console.error(action.error)
       return {
-        className: "",
+        isLoading: false,
         errorMessage: "Failed connecting to the server"
       }
     }
 
     case "UNEXPECTED_STATUS_CODE":
       return {
-        className: "",
+        isLoading: false,
         errorMessage: `Unexpected status code: ${action.status}`
       }
 
@@ -36,21 +36,22 @@ function reducer(state, action) {
 }
 
 const initialState = {
-  className: "",
+  isLoading: false,
   errorMessage: false
 }
 
 export default function AddLink({ makePopup, addNewDownload }) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
+  const URLInput = React.useRef(null)
 
-  async function connect(e) {
+  async function connect() {
 
     dispatch({ type: "LOADING" })
 
     try {
 
-      var { href } = new URL(e.target.previousElementSibling.value)
+      var { href } = new URL(URLInput.current.value)
 
     } catch (error) {
 
@@ -84,8 +85,6 @@ export default function AddLink({ makePopup, addNewDownload }) {
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    console.log(Object.fromEntries(res.headers.entries()))
-
     makePopup(
       <NewFileDialog
         url={res.headers.get("x-wdm-finalurl")}
@@ -97,11 +96,25 @@ export default function AddLink({ makePopup, addNewDownload }) {
   }
 
   return (
-    <div className="add-link">
+    <div className="connect-to-url">
 
-      <div className={`inputs ${state.className}`}>
-        <input type="url" autoFocus placeholder="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" disabled={state.className === "loading"} />
-        <button type="button" onClick={connect} disabled={state.className === "loading"}>Connect</button>
+      <div className="main-inputs">
+
+        <div className="label-input-pair">
+          <label htmlFor="URL-input">Downlaod link</label>
+          <input
+            type="url"
+            id="URL-input"
+            ref={URLInput}
+            disabled={state.isLoading}
+            placeholder={"https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"}
+            autoFocus />
+        </div>
+
+        <div className="confirm">
+          <button type="button" onClick={connect} disabled={state.isLoading}>Connect</button>
+        </div>
+
       </div>
 
       {state.errorMessage &&
