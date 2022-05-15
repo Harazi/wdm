@@ -18,14 +18,14 @@ export default React.memo(function Aside({ makePopup, addNewDownload }) {
         <li
           onClick={() => makePopup(
             <AddLink makePopup={makePopup} addNewDownload={addNewDownload} />,
-            "Insert the download link")}>
+            "Download anything from the web")}>
           Add Link
         </li>
 
         <li
           onClick={() => makePopup(
             <YoutubeLink makePopup={makePopup} addNewDownload={addNewDownload} />,
-            "Download video from Youtube"
+            "Download videos from Youtube"
           )}>
           From Youtube
         </li>
