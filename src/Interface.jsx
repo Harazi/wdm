@@ -1,4 +1,5 @@
 import React from "react"
+import ReactDOM from "react-dom"
 import Aside from "./aside/Aside"
 import Main from "./Main"
 import Popup from "./Popup"
@@ -47,11 +48,13 @@ export default function Interface({ downloadDirHandle }) {
 
       <Main {...{downloadList, removeDownloadEntry, downloadDirHandle}} />
 
-      {displayPopup &&
-      <Popup
-        closeFn={closePopup}
-        title={popupTitle}
-        render={displayPopup} />}
+      {displayPopup && ReactDOM.createPortal(
+        <Popup
+          closeFn={closePopup}
+          title={popupTitle}
+          render={displayPopup} />,
+          document.querySelector("#modal-root")
+      )}
 
     </div>
   )
