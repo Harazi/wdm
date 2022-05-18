@@ -1,11 +1,42 @@
 #popup {
   display: grid;
   position: fixed;
+  top: 0;
   height: 100vh;
   width: 100vw;
   place-items: center;
   background-color: rgba(#000000, 0.4);
   backdrop-filter: blur(2px);
+
+  &.open .popup-box {
+    animation: popup-box-open 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+
+    @keyframes popup-box-open {
+      from {
+        opacity: 0;
+        transform: translateY(-15px)
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  &.closed .popup-box {
+    animation: popup-box-closed 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+
+    @keyframes popup-box-closed {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(15px)
+      }
+    }
+  }
 
   .popup-box {
     display: grid;
@@ -16,7 +47,6 @@
     gap: 5px;
     background-color: var(--background-color);
     border-radius: 0.7em;
-    animation: popup 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53); // In · Quadratic
 
     .titlebar {
       display: grid;
@@ -48,16 +78,5 @@
         }
       }
     }
-  }
-}
-
-@keyframes popup {
-  from {
-    opacity: 0;
-    transform: translateY(-15px)
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0)
   }
 }
