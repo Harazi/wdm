@@ -48,7 +48,7 @@ export default function Interface({ downloadDirHandle }) {
 
       <Main {...{downloadList, removeDownloadEntry, downloadDirHandle}} />
 
-      {displayPopup && ReactDOM.createPortal(
+      {ReactDOM.createPortal(
         <Popup
           closeFn={closePopup}
           title={popupTitle}
