@@ -1,4 +1,6 @@
 import React from "react"
+import { format } from "bytes"
+import prettyMS from "pretty-ms"
 
 function reducer(state, action) {
   switch (action.type) {
@@ -116,7 +118,9 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry, down
     })()
 
     //? Doesn't work, idont know why
-    // return () => dispatch({ type: "COMPONENT_WILL_UNMOUNT", aborter: abortController.abort })
+    //// return () => dispatch({ type: "COMPONENT_WILL_UNMOUNT", aborter: abortController.abort })
+    //* try this
+    // return (() => dispatch({ type: "COMPONENT_WILL_UNMOUNT", aborter: abortController.abort }))
 
     return () => {
       console.log("aborting right now")
@@ -171,7 +175,7 @@ function DownloadSummary({ time, size }) {
       <span className="check-mark">
         <img src="icons/check-mark_24.png" alt="Check Mark" />
       </span>
-      Downloaded {size}Bytes in {time}s
+      Downloaded {format(size, { unitSeparator: ' ' })} in {prettyMS(Number(time.toFixed() + "000"))}
     </div>
   )
 }

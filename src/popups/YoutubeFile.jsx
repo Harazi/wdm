@@ -1,4 +1,6 @@
 import React from "react"
+import prettyMS from "pretty-ms"
+import { humanNumber } from "../utils/humanNumber"
 
 export default function YoutubeFile({ makePopup, addNewDownload, details }) {
 
@@ -57,16 +59,18 @@ export default function YoutubeFile({ makePopup, addNewDownload, details }) {
         <div className="text-container">
 
           <div className="title-author">
-            <p className="title">{details.title}</p>
+            <p className="title" title="video title">{details.title}</p>
             <span className="author">By <em>{details.author}</em></span>
           </div>
 
           <div className="meta-info">
-            <div>video length: {details.lengthSeconds}s</div>
+            <div className="length" title="video length">{prettyMS(
+              Number(Number(details.lengthSeconds).toFixed() + "000"),
+              { colonNotation: true }
+            )}</div>
             •
-            <div>{details.viewCount} views</div>
+            <div className="views" title="views count">{humanNumber(details.viewCount, 1)}</div>
           </div>
-
 
         </div>
 
@@ -92,7 +96,11 @@ export default function YoutubeFile({ makePopup, addNewDownload, details }) {
 
           <div className="base-name label-input-pair">
             <label htmlFor="base-name">Video name</label>
-            <input type="text" id="base-name" placeholder="Parkour Compilation" ref={videoFileNameInput}/>
+            <input
+              id="base-name"
+              type="text"
+              defaultValue={details.title}
+              ref={videoFileNameInput} />
           </div>
 
           <div className="dot">
