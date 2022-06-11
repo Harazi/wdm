@@ -1,4 +1,5 @@
 import React from "react"
+import { format } from "bytes"
 
 export default function NewFileDialog({ url, makePopup, addNewDownload }) {
 
@@ -18,6 +19,11 @@ export default function NewFileDialog({ url, makePopup, addNewDownload }) {
 
   return (
     <div className="new-file-dialog">
+
+      <div className="file-info">
+        <div className="info">size: {format(Number(size), { unitSeparator: ' ' })}</div>
+        <div className="info">resumable: {resumable ? "Yes" : "No"}</div>
+      </div>
 
       <div className="url-info label-input-pair">
         <label htmlFor="url-info">Downloading from: </label>

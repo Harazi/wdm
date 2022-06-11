@@ -49,6 +49,20 @@
     display: grid;
     row-gap: 1em;
 
+    .file-info {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 10px;
+
+      .info {
+        font-size: 0.7rem;
+        padding: 0.4em;
+        background-color: rgba(0, 128, 128, 0.7);
+        color: white;
+        border-radius: 5px;
+      }
+    }
+
     .file-name {
       display: grid;
       grid-template-columns: 1fr 50px 100px;
@@ -265,6 +279,11 @@
       padding: 0.2em;
       width: 100%;
       background-color: white;
+
+      &:disabled {
+        background-color: rgba(128, 128, 128, 0.5);
+        cursor: not-allowed;
+      }
     }
   }
 
