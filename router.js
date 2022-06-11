@@ -99,6 +99,7 @@ function requestPage(href, headers, cb, errorCb) {
 
   delete headers["host"]
   delete headers["origin"]
+  delete headers["accept-encoding"]
 
   const url = new URL(href)
 
