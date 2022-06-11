@@ -69,6 +69,7 @@ export default function AddLink({ makePopup, addNewDownload }) {
         referrer: "",
         headers: {
           'x-wdm': href,
+          range: "bytes=0-",
         },
         signal: abortController.signal,
       })
@@ -85,11 +86,18 @@ export default function AddLink({ makePopup, addNewDownload }) {
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
+    const fileSize = res.headers.get("content-length")
+    const contentDisposition = res.headers.get("content-disposition")
+    const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop()
+
     makePopup(
       <NewFileDialog
         url={res.headers.get("x-wdm-finalurl")}
         makePopup={makePopup}
-        addNewDownload={addNewDownload} />,
+        addNewDownload={addNewDownload}
+        size={fileSize}
+        defaultName={fileDefaultName}
+        resumable={res.status === 206} />,
       "File information"
     )
 
