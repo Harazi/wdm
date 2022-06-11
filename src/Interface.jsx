@@ -20,7 +20,7 @@ export default function Interface({ downloadDirHandle }) {
     setPopupTitle("")
   }, [setDisplayPopup, setPopupTitle])
 
-  const addNewDownload = React.useCallback((url, name) => {
+  const addNewDownload = React.useCallback((url, name, parts, resumable, size) => {
     // TODO: save the download state in the list
     // TODO: save the list in localstorage
     setDownloadList(list => [
@@ -30,7 +30,10 @@ export default function Interface({ downloadDirHandle }) {
         //! I've mistaken it with `Number.toString`
         id: `${url.toString(32)}-${name.toString(32)}`,
         url,
-        name
+        name,
+        parts,
+        resumable,
+        size,
       }
     ])
   }, [setDownloadList])

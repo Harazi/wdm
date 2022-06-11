@@ -12,9 +12,9 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
     const name = `${fileNameInput.current.value}.${extensionInput.current.value}`
     const parts = resumable && partsNumber.current.value || 1
 
-    console.log(url, name)
+    console.log(url, name, parts, resumable, size)
 
-    addNewDownload(url, name)
+    addNewDownload(url, name, parts, resumable, size)
 
     makePopup(false)
   }

@@ -13,6 +13,9 @@ export default React.memo(function Main({ downloadList, removeDownloadEntry, dow
               id={downloadObj.id}
               url={downloadObj.url}
               name={downloadObj.name}
+              parts={downloadObj.parts}
+              resumable={downloadObj.resumable}
+              size={downloadObj.size}
               removeDownloadEntry={removeDownloadEntry}
               downloadDirHandle={downloadDirHandle} />
           ))}
