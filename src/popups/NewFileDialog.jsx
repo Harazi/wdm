@@ -1,7 +1,7 @@
 import React from "react"
 import { format } from "bytes"
 
-export default function NewFileDialog({ url, makePopup, addNewDownload }) {
+export default function NewFileDialog({ url, makePopup, addNewDownload, size, defaultName, resumable }) {
 
   const fileNameInput = React.useRef(),
         extensionInput = React.useRef()
@@ -34,7 +34,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload }) {
 
         <div className="base-name label-input-pair">
           <label htmlFor="base-name">File name</label>
-          <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} autoFocus />
+          <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} autoFocus defaultValue={defaultName.match(/^(.*)\..*$/)?.[1]} />
         </div>
 
         <div className="dot">
@@ -43,7 +43,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload }) {
 
         <div className="extension label-input-pair">
           <label htmlFor="extension">File extension</label>
-          <input type="text" id="extension" placeholder="jpg" ref={extensionInput} />
+          <input type="text" id="extension" placeholder="jpg" ref={extensionInput} defaultValue={defaultName.match(/^.*\.(.*)/)?.[1]} />
         </div>
 
       </div>
