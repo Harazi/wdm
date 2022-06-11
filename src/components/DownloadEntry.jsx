@@ -2,135 +2,142 @@ import React from "react"
 import { format } from "bytes"
 import prettyMS from "pretty-ms"
 
-function reducer(state, action) {
-  switch (action.type) {
 
-    case "SET_CONTENT_LENGTH": {
-      console.log("File size: ", action.size)
+export default function DownloadEntry({ id, url, name, parts, resumable, size, removeDownloadEntry, downloadDirHandle }) {
 
-      const size = Number(action.size)
+  const [finishedDownloading, setFinishedDownloading] = React.useState(false)
 
-      if (size && size > 0)
-        return {
-          ...state,
-          fileSize: size,
-        }
+  const [partsState, setPartsState] = React.useState(Array(Number(parts)).fill(null).map(function fragmentMapFunction(v, i) {
+    return {
+      finished: false,
+      fragmentSize: size / parts, //! need to round it (no float)
+      startOffset: (size / parts) * i,
+      downloadedBytes: 0,
+      domElement: React.useRef(null), //! Possible memory leak
+      index: i,
     }
-
-    case "START":
-      return {
-        ...state,
-        startTime: Date.now()
-      }
-
-    case "INCOMING_CHUNK":
-      return {
-        ...state,
-        downloadedBytes: state.downloadedBytes + action.chunkSize,
-        // If `fileSize` is `false`, `progress` will be infinity
-        progress: (state.downloadedBytes + action.chunkSize) / state.fileSize * 100
-      }
-
-    case "FINISHED_DOWNLOADING": {
-      console.log("Finished Downloading ", state.downloadedBytes, "Bytes")
-      return {
-        ...state,
-        finished: true,
-        endTime: Date.now()
-      }
-    }
-
-    case "COMPONENT_WILL_UNMOUNT": {
-      console.log("Component will unmount")
-      console.dir(state)
-      if (!state.finished) {
-        console.log("inside if, before aborting")
-        action.aborter()
-        console.log("after aborting")
-      }
-    }
-
-    default:
-      throw new TypeError(`Unkonwn action type: ${action.type}`)
-  }
-}
-
-const initialState = {
-  fileSize: false,
-  finished: false,
-  downloadedBytes: 0,
-  progress: 0
-}
-
-export default function DownloadEntry({ id, url, name, removeDownloadEntry, downloadDirHandle }) {
-
-  const [state, dispatch] = React.useReducer(reducer, initialState)
+  }))
 
   React.useEffect(() => {
 
-    if (state.finished)
-      return  // Not sure if it's doing anything, since this function only run once in mounting
-
     const abortController = new AbortController()
 
-    window.aborter = abortController
+    for (const fragment of partsState) {
 
-    ;(async () => {
+      (async () => {
 
-      const fileHandle = await downloadDirHandle.getFileHandle(name, { create: true })
+        const fileHandle = await downloadDirHandle.getFileHandle(name.concat(`.part${fragment.index}`), { create: true })
 
-      // Currently Chrome will ignore `keepExistingData` option
-      const fileWriteable = await fileHandle.createWritable({ keepExistingData: true })
+        const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
 
+        const res = await fetch("apt/get", {
+          redirect: "manual",
+          cache: "no-store",
+          referrer: "",
+          headers: {
+            'x-wdm': url,
+            "range": `bytes=${fragment.startOffset}-${fragment.startOffset + fragment.fragmentSize}` //!! ????
+          },
+          signal: abortController.signal,
+        })
 
-      const res = await fetch("api/get", {
-        redirect: "manual",
-        cache: "no-store",
-        referrer: "",
-        headers: {
-          'x-wdm': url,
-        },
-        signal: abortController.signal,
-      })
+        const reader = res.body.getReader()
 
-      dispatch({ type: "SET_CONTENT_LENGTH", size: res.headers.get("content-length") })
+        while (true) {
 
-      const reader = res.body.getReader()
+          const { done, value } = await reader.read()
 
-      dispatch({ type: "START" })
+          if (done) {
 
-      while(true) {
+            await fileWritable.close()
 
-        const { done, value } = await reader.read()
+            setPartsState(parts => parts.map(fragmentObj => {
 
-        if (done) {
-          await fileWriteable.close()
-          dispatch({ type: "FINISHED_DOWNLOADING" })
-          break
+              if (fragmentObj.index === fragment.index) {
+                fragmentObj.finished = true
+              }
+
+              return fragmentObj
+            }))
+
+            break
+          }
+
+          await fileWritable.write(value)
+
+          setPartsState(parts => parts.map(fragmentObj => {
+
+            if (fragmentObj.index === fragment.index) {
+              fragmentObj.downloadedBytes += value.length
+            }
+
+            return fragmentObj
+          }))
+
         }
 
-        await fileWriteable.write(value)
+      })()
 
-        dispatch({ type: "INCOMING_CHUNK", chunkSize: value.length })
-
-      }
-
-    })()
-
-    //? Doesn't work, idont know why
-    //// return () => dispatch({ type: "COMPONENT_WILL_UNMOUNT", aborter: abortController.abort })
-    //* try this
-    // return (() => dispatch({ type: "COMPONENT_WILL_UNMOUNT", aborter: abortController.abort }))
+    }
 
     return () => {
       console.log("aborting right now")
       abortController.abort()
     }
-
   }, [])
+
+  React.useEffect(() => {
+
+    const allFinishedDownloading = partsState.reduce((finished, fragment) => {
+      if (!finished) // At least one part did not finish
+        return false
+      else
+        return fragment.finished
+    }, true)
+
+    if (!allFinishedDownloading)
+      return
+
+    (async () => {
+
+      const fileHandle = await downloadDirHandle.getFileHandle(name, { create: true })
+
+      const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
+
+      const promisesArray = parts.map( async fragment => new Promise(async (resolve, reject) => {
+
+        const fragmentFileHandle = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: false })
+
+        //TODO: get readable from fragmentFileHandle and pipe it to fileWritable
+        //TODO: after finishing DONT close fileWritable, just call resolve()
+
+      }))
+
+      for (const fragmentWritePromise of promisesArray) {
+        await fragmentWritePromise()
+      }
+
+      fileWritable.close()
+
+      setFinishedDownloading(true)
+
+    })
+
+  }, [partsState])
+
 
   return (
     <li>
+
+      <div className={`download-progress ${finishedDownloading && "finished"}`}>
+        {partsState.map(fragment => (
+          <span
+            className={`fragment ${fragment.finished && "finished"}`}
+            ref={fragment.domElement}
+            style={`--fragment-download-progress: ${fragment.downloadedBytes / fragment.fragmentSize}%;`}
+            key={fragment.index}>
+          </span>))}
+      </div>
 
       <p className="filename">
         {name}
@@ -158,11 +165,20 @@ export default function DownloadEntry({ id, url, name, removeDownloadEntry, down
 
       {
         !state.finished &&
-        <div className="controll-button">
+        <div className="controll-buttons">
+
+          {resumable && (
+            <button type="button" className="pause">
+              <img src="icons/pause_24.svg" alt="Pause Icon" />
+              Pause
+            </button>
+          )}
+
           <button type="button" className="cancel" onClick={() => removeDownloadEntry(id)}>
             <img src="icons/delete-forever_white_hq_18dp.png" alt="Delete Icon" />
             Cancel
           </button>
+
         </div>
       }
     </li>
