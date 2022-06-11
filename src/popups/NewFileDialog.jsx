@@ -4,11 +4,13 @@ import { format } from "bytes"
 export default function NewFileDialog({ url, makePopup, addNewDownload, size, defaultName, resumable }) {
 
   const fileNameInput = React.useRef(),
-        extensionInput = React.useRef()
+        extensionInput = React.useRef(),
+        partsNumber = React.useRef()
 
   function startDownload() {
 
     const name = `${fileNameInput.current.value}.${extensionInput.current.value}`
+    const parts = resumable && partsNumber.current.value || 1
 
     console.log(url, name)
 
@@ -48,14 +50,14 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
 
       </div>
 
-      {/* <div className="download-options">
+      <div className="download-options">
 
         <div className="download-parts label-input-pair">
-          <label htmlFor="parts">Download parts (disabled)</label>
-          <input type="number" id="parts" defaultValue={8} max={8} min={1} />
+          <label htmlFor="parts">Download parts</label>
+          <input type="number" id="parts" defaultValue={resumable && 8 || 1} max={8} min={1} readOnly={!resumable} ref={partsNumber} />
         </div>
 
-      </div> */}
+      </div>
 
       <div className="controll-buttons">
 
