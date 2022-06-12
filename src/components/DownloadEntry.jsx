@@ -13,7 +13,6 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
       fragmentSize: size / parts, //! need to round it (no float)
       startOffset: (size / parts) * i,
       downloadedBytes: 0,
-      domElement: React.useRef(null), //! Possible memory leak
       index: i,
     }
   }))
@@ -30,7 +29,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
         const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
 
-        const res = await fetch("apt/get", {
+        const res = await fetch("api/get", {
           redirect: "manual",
           cache: "no-store",
           referrer: "",
@@ -88,40 +87,58 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
   React.useEffect(() => {
 
+    console.log("partsState changed: inside useEffect")
+
     const allFinishedDownloading = partsState.reduce((finished, fragment) => {
       if (!finished) // At least one part did not finish
-        return false
+      return false
       else
-        return fragment.finished
+      return fragment.finished
     }, true)
 
     if (!allFinishedDownloading)
-      return
+    return
 
-    (async () => {
+    console.log("passed allFinishedDownloading test: inside useEffect")
+
+    ;(async () => {
 
       const fileHandle = await downloadDirHandle.getFileHandle(name, { create: true })
 
       const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
 
-      const promisesArray = parts.map( async fragment => new Promise(async (resolve, reject) => {
+      const promisesArray = partsState.map( async fragment => new Promise(async (resolve, reject) => {
 
         const fragmentFileHandle = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: false })
 
-        //TODO: get readable from fragmentFileHandle and pipe it to fileWritable
-        //TODO: after finishing DONT close fileWritable, just call resolve()
+        const fragmentFile = await fragmentFileHandle.getFile()
+
+        const fragmentStream = fragmentFile.stream()
+
+        const fragmentReader = fragmentStream.getReader()
+
+        while (true) {
+          const { done, value } = await fragmentReader.read()
+
+          if (done) {
+            resolve()
+            break
+          }
+
+          await fileWritable.write(value)
+        }
 
       }))
 
       for (const fragmentWritePromise of promisesArray) {
-        await fragmentWritePromise()
+        await fragmentWritePromise
       }
 
       fileWritable.close()
 
       setFinishedDownloading(true)
 
-    })
+    })()
 
   }, [partsState])
 
@@ -133,8 +150,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
         {partsState.map(fragment => (
           <span
             className={`fragment ${fragment.finished && "finished"}`}
-            ref={fragment.domElement}
-            style={`--fragment-download-progress: ${fragment.downloadedBytes / fragment.fragmentSize}%;`}
+            style={{"--fragment-download-progress": `${fragment.downloadedBytes / fragment.fragmentSize * 100}%` }}
             key={fragment.index}>
           </span>))}
       </div>
@@ -147,16 +163,16 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
         {url}
       </span>
 
-      <div className="download-prog">
+      {/* <div className="download-prog"> */}
         {/* replace it with a div container and n span children
         the n is relative to the download parts. e.g. 8 spans */}
 
-        {
-          state.finished && <DownloadSummary time={(state.endTime - state.startTime) / 1000} size={state.downloadedBytes} />
+        {/* {
+          finishedDownloading && <DownloadSummary time={(state.endTime - state.startTime) / 1000} size={size} />
           || state.fileSize && <progress max="100" value={state.progress}></progress>
           || <progress></progress>
-        }
-      </div>
+        } */}
+      {/* </div> */}
 
       {/* TODO: add a pause/resume button */}
       {/* <div className="controll-button">
@@ -164,7 +180,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
       </div> */}
 
       {
-        !state.finished &&
+        !finishedDownloading &&
         <div className="controll-buttons">
 
           {resumable && (
