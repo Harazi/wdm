@@ -121,6 +121,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
           const { done, value } = await fragmentReader.read()
 
           if (done) {
+            await downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
             resolve()
             break
           }
