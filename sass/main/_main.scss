@@ -6,12 +6,12 @@ main {
 
       li {
         display: grid;
-        margin: 0.3em 0 0 0.5em;
+        position: relative;
+        padding: 0.5em;
         grid-template-areas:
-          "filename filename . ."
-          "download-url download-url download-url controll-button"
-          "download-prog download-prog download-prog controll-button"
-          "download-prog download-prog download-prog .";
+          "filename filename controll-buttons controll-buttons"
+          "filename filename controll-buttons controll-buttons"
+          "download-url download-url controll-buttons controll-buttons";
 
         .filename {
           grid-area: filename;
@@ -27,30 +27,22 @@ main {
           font-style: italic;
         }
 
-        .download-prog {
-          grid-area: download-prog;
-          width: 100%;
 
-          progress {
-            cursor: progress;
-          }
+      //   .download-summary {
+      //     font-size: 0.7rem;
+      //     font-style: italic;
 
-          .download-summary {
-            font-size: 0.7rem;
-            font-style: italic;
+      //     .check-mark {
+      //       padding-right: 0.3em;
 
-            .check-mark {
-              padding-right: 0.3em;
+      //       img {
+      //         vertical-align: middle;
+      //       }
+      //     }
+      //   }
 
-              img {
-                vertical-align: middle;
-              }
-            }
-          }
-        }
-
-        .controll-button {
-          grid-area: controll-button;
+        .controll-buttons {
+          grid-area: controll-buttons;
           text-align: center;
 
           button {
@@ -83,14 +75,16 @@ main {
           display: flex;
           flex-flow: row nowrap;
 
-          &.finished .fragment {
-            background-color: forestgreen;
+          &.finished .fragment.finished {
+            background-color: powderblue;
           }
 
           .fragment {
             flex: 1 0;
             position: relative;
             background-color: #90ee90aa; // palegreen
+            overflow: hidden;
+            transition: background-color 0.2s ease-in-out;
 
             &.finished {
               background-color: #90ee90;
@@ -99,12 +93,12 @@ main {
             &::after {
               content: '';
               position: absolute;
-              right: 0;
+              left: var(--fragment-download-progress);
               display: block;
-              width: var(--fragment-download-progress);
+              width: 100%;
               height: 100%;
               background-color: var(--background-color);
-              transition: width 0.1s ease;
+              transition: left 0.1s ease-in-out;
             }
           }
         }
