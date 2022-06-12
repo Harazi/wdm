@@ -97,7 +97,7 @@ export default function AddLink({ makePopup, addNewDownload }) {
         addNewDownload={addNewDownload}
         size={fileSize}
         defaultName={fileDefaultName}
-        resumable={res.status === 206} />,
+        resumable={res.status === 206 && Number(fileSize) > 0} />,
       "File information"
     )
 
