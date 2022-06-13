@@ -2,8 +2,14 @@ import React from "react"
 import { format } from "bytes"
 import prettyMS from "pretty-ms"
 
+import { streamToFile } from "../utils/streamToFile"
+
 
 export default function DownloadEntry({ id, url, name, parts, resumable, size, removeDownloadEntry, downloadDirHandle }) {
+
+  const startTime = React.useRef(Date.now())
+  const endTime = React.useRef(null)
+  const totalDownloadSize = React.useRef(0)
 
   const [finishedDownloading, setFinishedDownloading] = React.useState(false)
 
@@ -25,9 +31,8 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
       (async () => {
 
-        const fileHandle = await downloadDirHandle.getFileHandle(name.concat(`.part${fragment.index}`), { create: true })
-
-        const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
+        const fileWritable = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: true })
+          .then(handle => handle.createWritable({ keepExistingData: false }))
 
         const res = await fetch("api/get", {
           redirect: "manual",
@@ -42,38 +47,31 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
         const reader = res.body.getReader()
 
-        while (true) {
+        streamToFile({ reader, writable: fileWritable,
+          on: {
+            progress: length => {
+              totalDownloadSize += length
+              setPartsState(parts => parts.map(fragmentObj => {
 
-          const { done, value } = await reader.read()
+                if (fragmentObj.index === fragment.index) {
+                  fragmentObj.downloadedBytes += length
+                }
 
-          if (done) {
+                return fragmentObj
+              }))
+            },
+            finish: () => {
+              setPartsState(parts => parts.map(fragmentObj => {
 
-            await fileWritable.close()
+                if (fragmentObj.index === fragment.index) {
+                  fragmentObj.finished = true
+                }
 
-            setPartsState(parts => parts.map(fragmentObj => {
-
-              if (fragmentObj.index === fragment.index) {
-                fragmentObj.finished = true
-              }
-
-              return fragmentObj
-            }))
-
-            break
-          }
-
-          await fileWritable.write(value)
-
-          setPartsState(parts => parts.map(fragmentObj => {
-
-            if (fragmentObj.index === fragment.index) {
-              fragmentObj.downloadedBytes += value.length
+                return fragmentObj
+              }))
             }
-
-            return fragmentObj
-          }))
-
-        }
+          }
+        })
 
       })()
 
@@ -103,31 +101,25 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
     ;(async () => {
 
-      const fileHandle = await downloadDirHandle.getFileHandle(name, { create: true })
-
-      const fileWritable = await fileHandle.createWritable({ keepExistingData: false })
+      const fileWritable = await downloadDirHandle.getFileHandle(name, { create: true })
+        .then(handle => handle.createWritable({ keepExistingData: false }))
 
       const promisesArray = partsState.map( async fragment => new Promise(async (resolve, reject) => {
 
-        const fragmentFileHandle = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: false })
+        const fragmentReader = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: false })
+          .then(handle => handle.getFile())
+          .then(file => file.stream())
+          .then(stream => stream.getReader())
 
-        const fragmentFile = await fragmentFileHandle.getFile()
-
-        const fragmentStream = fragmentFile.stream()
-
-        const fragmentReader = fragmentStream.getReader()
-
-        while (true) {
-          const { done, value } = await fragmentReader.read()
-
-          if (done) {
-            await downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
-            resolve()
-            break
-          }
-
-          await fileWritable.write(value)
-        }
+          streamToFile({ reader: fragmentReader, writable: fileWritable,
+            on: {
+              finish: () => {
+                await downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
+                endTime.current = Date.now()
+                resolve()
+              }
+            }
+          })
 
       }))
 
@@ -164,28 +156,12 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
         {url}
       </span>
 
-      {/* <div className="download-prog"> */}
-        {/* replace it with a div container and n span children
-        the n is relative to the download parts. e.g. 8 spans */}
+      {!finishedDownloading && (
 
-        {/* {
-          finishedDownloading && <DownloadSummary time={(state.endTime - state.startTime) / 1000} size={size} />
-          || state.fileSize && <progress max="100" value={state.progress}></progress>
-          || <progress></progress>
-        } */}
-      {/* </div> */}
-
-      {/* TODO: add a pause/resume button */}
-      {/* <div className="controll-button">
-        <button type="button" className="play"></button>
-      </div> */}
-
-      {
-        !finishedDownloading &&
         <div className="controll-buttons">
 
           {resumable && (
-            <button type="button" className="pause">
+            <button type="button" className="pause" disabled>
               <img src="icons/pause_24.svg" alt="Pause Icon" />
               Pause
             </button>
@@ -197,7 +173,9 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
           </button>
 
         </div>
-      }
+      ) || (
+        <DownloadSummary time={(endTime.current - startTime.current) / 1000} size={totalDownloadSize.current} />
+      )}
     </li>
   )
 }
