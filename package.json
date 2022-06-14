@@ -22,10 +22,11 @@
   "author": "Husam Ahmed <husam999h@gmail.com>",
   "license": "GPL-3.0",
   "dependencies": {
-    "@ceicc/range": "^3.0.0-beta.1",
+    "@ceicc/range": "~3.0.0-beta.8",
     "axios": "^0.26.1",
     "bytes": "^3.1.2",
     "cross-env": "^7.0.3",
+    "divrem": "~1.0.3",
     "express": "^4.17.3",
     "mime-types": "^2.1.35",
     "pretty-ms": "^7.0.1"
