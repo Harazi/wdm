@@ -14,7 +14,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
 
     console.log(url, name, parts, resumable, size)
 
-    addNewDownload(url, name, parts, resumable, size)
+    addNewDownload(url, name, Number(parts), resumable, Number(size))
 
     makePopup(false)
   }
