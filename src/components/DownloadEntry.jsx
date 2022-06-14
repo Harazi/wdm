@@ -1,6 +1,7 @@
 import React from "react"
 import { format } from "bytes"
 import prettyMS from "pretty-ms"
+import { divrem } from "divrem"
 
 import { streamToFile } from "../utils/streamToFile"
 
@@ -13,11 +14,27 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
   const [finishedDownloading, setFinishedDownloading] = React.useState(false)
 
-  const [partsState, setPartsState] = React.useState(Array(Number(parts)).fill(null).map(function fragmentMapFunction(v, i) {
+  const fragmentsSizeMap = React.useMemo(() => {
+
+    if (!resumable) // Size is unknown, or server doesn't support range requests
+      return [{ fragmentSize: size }]
+
+    const { count, rem } = divrem(size, parts)
+
+    const map = Array(parts).fill(0).map(() => ({
+      fragmentSize: count,
+    }))
+
+    map[map.length - 1].fragmentSize += rem
+
+    return map
+  }, [])
+
+  const [partsState, setPartsState] = React.useState(Array(parts).fill(null).map(function fragmentMapFunction(v, i) {
     return {
       finished: false,
-      fragmentSize: size / parts, //! need to round it (no float)
-      startOffset: (size / parts) * i,
+      fragmentSize: fragmentsSizeMap[i].fragmentSize - 1,
+      startOffset: (fragmentsSizeMap[0].fragmentSize) * i,
       downloadedBytes: 0,
       index: i,
     }
@@ -50,7 +67,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
         streamToFile({ reader, writable: fileWritable,
           on: {
             progress: length => {
-              totalDownloadSize += length
+              totalDownloadSize.current += length
               setPartsState(parts => parts.map(fragmentObj => {
 
                 if (fragmentObj.index === fragment.index) {
@@ -60,7 +77,8 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
                 return fragmentObj
               }))
             },
-            finish: () => {
+            finish: async () => {
+              await fileWritable.close()
               setPartsState(parts => parts.map(fragmentObj => {
 
                 if (fragmentObj.index === fragment.index) {
@@ -114,9 +132,9 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
           streamToFile({ reader: fragmentReader, writable: fileWritable,
             on: {
               finish: () => {
-                await downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
                 endTime.current = Date.now()
-                resolve()
+                downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
+                  .then(resolve)
               }
             }
           })
