@@ -28,18 +28,20 @@ main {
         }
 
 
-      //   .download-summary {
-      //     font-size: 0.7rem;
-      //     font-style: italic;
+        .download-summary {
+          font-size: 0.7rem;
+          font-style: italic;
+          grid-row-start: 3;
+          grid-column-start: 4;
 
-      //     .check-mark {
-      //       padding-right: 0.3em;
+          .check-mark {
+            padding-right: 0.3em;
 
-      //       img {
-      //         vertical-align: middle;
-      //       }
-      //     }
-      //   }
+            img {
+              vertical-align: middle;
+            }
+          }
+        }
 
         .controll-buttons {
           grid-area: controll-buttons;
