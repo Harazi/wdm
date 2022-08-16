@@ -57,8 +57,10 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
           referrer: "",
           headers: {
             'x-wdm': url,
-            "range": `bytes=${fragment.startOffset}-${fragment.startOffset + fragment.fragmentSize}` //!! ????
-          },
+            "range": resumable
+              ? `bytes=${fragment.startOffset}-${fragment.startOffset + fragment.fragmentSize}`
+              : "bytes=0-"
+          }, //!! ????
           signal: abortController.signal,
         })
 
