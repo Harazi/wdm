@@ -23,25 +23,25 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@ceicc/range": "~3.0.0",
-    "axios": "^0.26.1",
-    "bytes": "^3.1.2",
-    "cross-env": "^7.0.3",
+    "axios": "~0.27.2",
+    "bytes": "~3.1.2",
+    "cross-env": "~7.0.3",
     "divrem": "~1.0.3",
-    "express": "^4.17.3",
-    "mime-types": "^2.1.35",
-    "pretty-ms": "^7.0.1"
+    "express": "~4.18.1",
+    "mime-types": "~2.1.35",
+    "pretty-ms": "~8.0.0"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.16.7",
-    "babel-loader": "^8.2.3",
-    "nodemon": "^2.0.15",
-    "npm-run-all": "^4.1.5",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "sass": "^1.51.0",
+    "@babel/preset-react": "~7.18.6",
+    "babel-loader": "~8.2.5",
+    "nodemon": "~2.0.19",
+    "npm-run-all": "~4.1.5",
+    "react": "~18.2.0",
+    "react-dom": "~18.2.0",
+    "sass": "~1.54.4",
     "ts-loader": "~9.3.1",
     "typescript": "~4.7.4",
-    "webpack": "^5.69.0",
-    "webpack-cli": "^4.9.2"
+    "webpack": "~5.74.0",
+    "webpack-cli": "~4.10.0"
   }
 }
