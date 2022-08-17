@@ -1,3 +1,4 @@
 node_modules
 public/stylesheets
 public/js
+package-lock.json
