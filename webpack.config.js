@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url"
 
 export default {
 
-  entry: "./src/index.jsx",
+  entry: "./src/index.tsx",
 
   output: {
     path: join(dirname(fileURLToPath(import.meta.url)), "public", "js"),
@@ -12,28 +12,23 @@ export default {
 
   mode: "development",
 
+  resolve: {
+    extensions: ['.ts', '.tsx', '...']
+  },
+
   module: {
-    rules: [
-      {
-        test: /\.jsx$/,
-        exclude: /node_modules/,
-        use: {
+    rules: [{
+      test: /\.tsx?$/,
+      exclude: /node_modules/,
+      use: [
+        {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-react"]
           }
-        }
-      }
-    ]
+        },
+        "ts-loader",
+      ]
+    }]
   },
-
-  resolve: {
-    extensions: ['.js', '.jsx']
-  },
-
-  devServer: {
-    port: 8080,
-    // contentBase: join(dirname(fileURLToPath(import.meta.url)), "public"),
-    static: './public',
-  }
 }
