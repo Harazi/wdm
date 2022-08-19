@@ -1,66 +1,46 @@
 import React from "react"
 import YoutubeFile from "./YoutubeFile"
+import { isValidYoutubeURL } from "../utils/isValidYoutubeURL"
 
-function reducer(state, action) {
-  switch (action.type) {
+import type {
+  MakePopupFunction,
+  AddNewDownloadEntry
+} from "../types"
 
-    case "LOADING":
-      return {
-        isLoading: true,
-        errorMessage: false
-      }
-
-    case "INVALID_LINK":
-      return {
-        isLoading: false,
-        errorMessage: "That's invalid youtube link. Try inserting only the Identifier"
-      }
-
-    case "FAILED_FETCHING": {
-      console.error(action.error)
-      return {
-        isLoading: false,
-        errorMessage: "Failed connecting to the server"
-      }
-    }
-
-    case "UNEXPECTED_STATUS_CODE":
-      return {
-        isLoading: false,
-        errorMessage: `Unexpected status code: ${action.status}`
-      }
-
-    default:
-      throw new TypeError(`Unkonwn action type: ${action.type}`)
-  }
+interface YoutubeLinkProps {
+  makePopup: MakePopupFunction
+  addNewDownload: AddNewDownloadEntry
 }
 
-const initialState = {
+interface ReducerState {
+  isLoading: boolean
+  errorMessage: string | null
+}
+
+type ReducerActionTypes = "LOADING" | "INVALID_LINK" | "FAILED_FETCHING" | "UNEXPECTED_STATUS_CODE"
+
+interface ReducerActionObject {
+  type: ReducerActionTypes
+  error?: any
+  status?: number
+}
+
+const initialState: ReducerState = {
   isLoading: false,
-  errorMessage: false
+  errorMessage: null
 }
 
-/**
- * @param {string} url
- * @returns {boolean|string}
- */
-function isValidYoutubeURL(url) {
-  const regexResult = url.match(/(:?\/|\?|v=|^)(?<id>[a-zA-Z0-9_-]{11})(?:&|\/|$)/)
-  return regexResult && regexResult.groups.id
-}
-
-
-export default function YoutubeLink({ makePopup, addNewDownload }) {
+export default function YoutubeLink({ makePopup, addNewDownload }: YoutubeLinkProps) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
-  const URLInput = React.useRef()
+  const URLInput = React.useRef<HTMLInputElement>(null)
 
   async function connect() {
 
     dispatch({ type: "LOADING" })
 
-    const id = isValidYoutubeURL(URLInput.current.value)
+    const id = isValidYoutubeURL(URLInput.current?.value)
 
     if (!id)
       return dispatch({ type: "INVALID_LINK" })
@@ -122,4 +102,38 @@ export default function YoutubeLink({ makePopup, addNewDownload }) {
     </div>
   )
 
+}
+
+function reducer(state: ReducerState, action: ReducerActionObject): ReducerState {
+  switch (action.type) {
+
+    case "LOADING":
+      return {
+        isLoading: true,
+        errorMessage: null
+      }
+
+    case "INVALID_LINK":
+      return {
+        isLoading: false,
+        errorMessage: "That's invalid youtube link. Try inserting only the Identifier"
+      }
+
+    case "FAILED_FETCHING": {
+      console.error(action.error)
+      return {
+        isLoading: false,
+        errorMessage: "Failed connecting to the server"
+      }
+    }
+
+    case "UNEXPECTED_STATUS_CODE":
+      return {
+        isLoading: false,
+        errorMessage: `Unexpected status code: ${action.status}`
+      }
+
+    default:
+      throw new TypeError(`Unkonwn action type: ${action.type}`)
+  }
 }

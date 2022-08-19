@@ -1,13 +1,19 @@
-import React from "react"
+import React, { HTMLAttributes } from "react"
 
-export default React.memo(function Popup({ render, title, closeFn }) {
+interface PopupProps {
+  render: React.ReactNode,
+  title: string,
+  closeFn: VoidFunction
+}
+
+export default React.memo(function Popup({ render, title, closeFn }: PopupProps) {
 
   const [classN, setClassN] = React.useState("open")
 
-  function click(e) {
+  const click: React.MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
     if (
-      !e.target.closest(".close-button")
-      && e.target.closest(".popup-box")
+      !(e.target as Element).closest(".close-button")
+      && (e.target as Element).closest(".popup-box")
     ) return // Clicked inside the box
 
     setClassN("closed") // Starts the animation
@@ -20,7 +26,7 @@ export default React.memo(function Popup({ render, title, closeFn }) {
     setClassN("open")
   }, [render])
 
-  return render && (
+  return render ? (
     <div id="popup" className={classN} onMouseDown={click}>
 
       <div className="popup-box">
@@ -46,5 +52,5 @@ export default React.memo(function Popup({ render, title, closeFn }) {
       </div>
 
     </div>
-  )
+  ) : null
 })

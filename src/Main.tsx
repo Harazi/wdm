@@ -1,7 +1,18 @@
 import React from "react"
 import DownloadEntry from "./components/DownloadEntry"
 
-export default React.memo(function Main({ downloadList, removeDownloadEntry, downloadDirHandle }) {
+import type {
+  DownloadEntryProperties,
+  RemoveDownloadEntryFunction,
+} from "./types"
+
+interface MainProps {
+  downloadList: DownloadEntryProperties[]
+  removeDownloadEntry: RemoveDownloadEntryFunction
+  downloadDirHandle: FileSystemDirectoryHandle
+}
+
+export default React.memo(function Main({ downloadList, removeDownloadEntry, downloadDirHandle }: MainProps) {
   return (
     <main>
       <div id="download-list">
@@ -10,12 +21,7 @@ export default React.memo(function Main({ downloadList, removeDownloadEntry, dow
           {downloadList.map((downloadObj) => (
             <DownloadEntry
               key={downloadObj.id}
-              id={downloadObj.id}
-              url={downloadObj.url}
-              name={downloadObj.name}
-              parts={downloadObj.parts}
-              resumable={downloadObj.resumable}
-              size={downloadObj.size}
+              {...downloadObj}
               removeDownloadEntry={removeDownloadEntry}
               downloadDirHandle={downloadDirHandle} />
           ))}

@@ -5,7 +5,7 @@ import Interface from "./Interface"
 
 export default function App() {
 
-  const [downloadDirHandle, setDownloadDirHandle] = React.useState(false)
+  const [downloadDirHandle, setDownloadDirHandle] = React.useState<FileSystemDirectoryHandle | null>(null)
 
   async function selectDownloadDirectory() {
 
@@ -20,7 +20,7 @@ export default function App() {
       setDownloadDirHandle(dirHandle)
     } catch (error) {
       console.error(error)
-      setDownloadDirHandle(false)
+      setDownloadDirHandle(null)
     }
 
   }

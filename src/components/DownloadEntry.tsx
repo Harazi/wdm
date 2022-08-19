@@ -1,23 +1,30 @@
 import React from "react"
-import { format } from "bytes"
-import prettyMS from "pretty-ms"
 import { divrem } from "divrem"
-
 import { streamToFile } from "../utils/streamToFile"
+import { DownloadSummary } from "./DownloadSummary"
 
+import type {
+  DownloadEntryProperties,
+  RemoveDownloadEntryFunction
+} from "../types"
 
-export default function DownloadEntry({ id, url, name, parts, resumable, size, removeDownloadEntry, downloadDirHandle }) {
+interface DownloadEntryProps extends DownloadEntryProperties {
+  removeDownloadEntry: RemoveDownloadEntryFunction
+  downloadDirHandle: FileSystemDirectoryHandle
+}
+
+export default function DownloadEntry({ id, url, fileName, parts, resumable, size, removeDownloadEntry, downloadDirHandle }: DownloadEntryProps) {
 
   const startTime = React.useRef(Date.now())
-  const endTime = React.useRef(null)
+  const endTime = React.useRef<number | null>(null)
   const totalDownloadSize = React.useRef(0)
 
   const [finishedDownloading, setFinishedDownloading] = React.useState(false)
 
   const fragmentsSizeMap = React.useMemo(() => {
 
-    if (!resumable) // Size is unknown, or server doesn't support range requests
-      return [{ fragmentSize: size }]
+    if (!resumable || !size) // Size is unknown, or server doesn't support range requests
+      return [{ fragmentSize: 0 }]
 
     const { count, rem } = divrem(size, parts)
 
@@ -48,7 +55,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
       (async () => {
 
-        const fileWritable = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: true })
+        const fileWritable = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: true })
           .then(handle => handle.createWritable({ keepExistingData: false }))
 
         const res = await fetch("api/get", {
@@ -56,13 +63,16 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
           cache: "no-store",
           referrer: "",
           headers: {
-            'x-wdm': url,
+            'x-wdm': url.href,
             "range": resumable
               ? `bytes=${fragment.startOffset}-${fragment.startOffset + fragment.fragmentSize}`
               : "bytes=0-"
           }, //!! ????
           signal: abortController.signal,
         })
+
+        if (!res.body)
+          throw new Error("Response body is null!")
 
         const reader = res.body.getReader()
 
@@ -121,12 +131,12 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
 
     ;(async () => {
 
-      const fileWritable = await downloadDirHandle.getFileHandle(name, { create: true })
+      const fileWritable = await downloadDirHandle.getFileHandle(fileName, { create: true })
         .then(handle => handle.createWritable({ keepExistingData: false }))
 
       const promisesArray = partsState.map( async fragment => new Promise(async (resolve, reject) => {
 
-        const fragmentReader = await downloadDirHandle.getFileHandle(`${name}.part${fragment.index}`, { create: false })
+        const fragmentReader = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: false })
           .then(handle => handle.getFile())
           .then(file => file.stream())
           .then(stream => stream.getReader())
@@ -135,7 +145,7 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
             on: {
               finish: () => {
                 endTime.current = Date.now()
-                downloadDirHandle.removeEntry(`${name}.part${fragment.index}`) // Delete temporary part file
+                downloadDirHandle.removeEntry(`${fileName}.part${fragment.index}`) // Delete temporary part file
                   .then(resolve)
               }
             }
@@ -163,50 +173,43 @@ export default function DownloadEntry({ id, url, name, parts, resumable, size, r
         {partsState.map(fragment => (
           <span
             className={`fragment ${fragment.finished && "finished"}`}
-            style={{"--fragment-download-progress": `${fragment.downloadedBytes / fragment.fragmentSize * 100}%` }}
+            style={{"--fragment-download-progress": `${fragment.downloadedBytes / fragment.fragmentSize * 100}%` } as React.CSSProperties}
             key={fragment.index}>
           </span>))}
       </div>
 
       <p className="filename">
-        {name}
+        {fileName}
       </p>
 
-      <span className="download-url" title={url}>
-        {url}
+      <span className="download-url" title={url.href}>
+        {url.href}
       </span>
 
-      {!finishedDownloading && (
+      {finishedDownloading &&
+        (
+          <DownloadSummary time={((endTime.current ?? Date.now()) - startTime.current) / 1000} size={totalDownloadSize.current} />
+        ) ||
+        (
+          <div className="controll-buttons">
 
-        <div className="controll-buttons">
+            {resumable && (
+              <button type="button" className="pause" disabled>
+                <img src="icons/pause_24.svg" alt="Pause Icon" />
+                Pause
+              </button>
+            )}
 
-          {resumable && (
-            <button type="button" className="pause" disabled>
-              <img src="icons/pause_24.svg" alt="Pause Icon" />
-              Pause
+            <button type="button" className="cancel" onClick={() => removeDownloadEntry(id)}>
+              <img src="icons/delete-forever_white_hq_18dp.png" alt="Delete Icon" />
+              Cancel
             </button>
-          )}
 
-          <button type="button" className="cancel" onClick={() => removeDownloadEntry(id)}>
-            <img src="icons/delete-forever_white_hq_18dp.png" alt="Delete Icon" />
-            Cancel
-          </button>
-
-        </div>
-      ) || (
-        <DownloadSummary time={(endTime.current - startTime.current) / 1000} size={totalDownloadSize.current} />
-      )}
+          </div>
+        )
+      }
     </li>
   )
 }
 
-function DownloadSummary({ time, size }) {
-  return (
-    <div className="download-summary">
-      <span className="check-mark">
-        <img src="icons/check-mark_24.png" alt="Check Mark" />
-      </span>
-      Downloaded {format(size, { unitSeparator: ' ' })} in {prettyMS(Number(time.toFixed() + "000"))}
-    </div>
-  )
-}
+

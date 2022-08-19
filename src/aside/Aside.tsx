@@ -3,7 +3,17 @@ import Nav from "./Nav"
 import AddLink from "../popups/AddLink"
 import YoutubeLink from "../popups/YoutubeLink"
 
-export default React.memo(function Aside({ makePopup, addNewDownload }) {
+import type {
+  MakePopupFunction,
+  AddNewDownloadEntry
+} from "../types"
+
+interface AsideProps {
+  makePopup: MakePopupFunction
+  addNewDownload: AddNewDownloadEntry
+}
+
+export default React.memo(function Asside({ makePopup, addNewDownload }: AsideProps) {
   return (
     <aside>
 

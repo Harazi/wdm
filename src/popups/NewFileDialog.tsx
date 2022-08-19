@@ -1,22 +1,36 @@
 import React from "react"
 import { format } from "bytes"
 
-export default function NewFileDialog({ url, makePopup, addNewDownload, size, defaultName, resumable }) {
+import type {
+  MakePopupFunction,
+  AddNewDownloadEntry
+} from "../types"
 
-  const fileNameInput = React.useRef(),
-        extensionInput = React.useRef(),
-        partsNumber = React.useRef()
+interface NewFileDialogProps {
+  url: URL
+  makePopup: MakePopupFunction
+  addNewDownload: AddNewDownloadEntry
+  size: number | null
+  defaultName: string
+  resumable: boolean
+}
+
+export default function NewFileDialog({ url, makePopup, addNewDownload, size, defaultName, resumable }: NewFileDialogProps) {
+
+  const fileNameInput = React.useRef<HTMLInputElement>(null),
+        extensionInput = React.useRef<HTMLInputElement>(null),
+        partsNumber = React.useRef<HTMLInputElement>(null)
 
   function startDownload() {
 
-    const name = `${fileNameInput.current.value}.${extensionInput.current.value}`
-    const parts = resumable && partsNumber.current.value || 1
+    const name = `${fileNameInput.current?.value}.${extensionInput.current?.value}`
+    const parts = resumable && partsNumber.current?.value || 1
 
     console.log(url, name, parts, resumable, size)
 
     addNewDownload(url, name, Number(parts), resumable, Number(size))
 
-    makePopup(false)
+    makePopup(null, '')
   }
 
   return (
@@ -29,7 +43,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
 
       <div className="url-info label-input-pair">
         <label htmlFor="url-info">Downloading from: </label>
-        <input type="url" id="url-info" readOnly value={url} />
+        <input type="url" id="url-info" readOnly value={url.href} />
       </div>
 
       <div className="file-name">
@@ -62,7 +76,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
       <div className="controll-buttons">
 
         <div className="button-container cancel">
-          <button type="button" onClick={() => makePopup(false)}>Cancel</button>
+          <button type="button" onClick={() => makePopup(null, '')}>Cancel</button>
         </div>
 
         <div className="button-container start">

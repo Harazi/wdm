@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function GetDirHandle({ onClick }) {
+export default function GetDirHandle({ onClick }: { onClick: VoidFunction }) {
   return (
     <div className="get-dir-handle-container">
       <button type="button" onClick={onClick} autoFocus>

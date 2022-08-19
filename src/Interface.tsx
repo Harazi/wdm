@@ -4,33 +4,44 @@ import Aside from "./aside/Aside"
 import Main from "./Main"
 import Popup from "./Popup"
 
-export default function Interface({ downloadDirHandle }) {
+import type {
+  DownloadEntryProperties,
+  MakePopupFunction,
+  ClosePopupFunction,
+  AddNewDownloadEntry,
+  RemoveDownloadEntryFunction
+} from "./types"
 
-  const [displayPopup, setDisplayPopup] = React.useState(false)
+const modalElement = document.querySelector("#modal-root")
+
+if (!modalElement)
+  throw new Error("No modual element found!")
+
+export default function Interface({ downloadDirHandle }: { downloadDirHandle: FileSystemDirectoryHandle }) {
+
+  const [displayPopup, setDisplayPopup] = React.useState<React.ReactNode | null>(null)
   const [popupTitle, setPopupTitle] = React.useState("")
-  const [downloadList, setDownloadList] = React.useState([])
+  const [downloadList, setDownloadList] = React.useState<DownloadEntryProperties[]>([])
 
-  const makePopup = React.useCallback((component, title) => {
+  const makePopup: MakePopupFunction = React.useCallback((component, title) => {
     setDisplayPopup(component)
     setPopupTitle(title)
   }, [setDisplayPopup, setPopupTitle])
 
-  const closePopup = React.useCallback(() => {
-    setDisplayPopup(false)
+  const closePopup: ClosePopupFunction = React.useCallback(() => {
+    setDisplayPopup(null)
     setPopupTitle("")
   }, [setDisplayPopup, setPopupTitle])
 
-  const addNewDownload = React.useCallback((url, name, parts, resumable, size) => {
+  const addNewDownload: AddNewDownloadEntry = React.useCallback((url, fileName, parts, resumable, size) => {
     // TODO: save the download state in the list
     // TODO: save the list in localstorage
     setDownloadList(list => [
       ...list,
       {
-        //! `String.toString` doesn't accept any parameter
-        //! I've mistaken it with `Number.toString`
-        id: `${url.toString(32)}-${name.toString(32)}`,
+        id: `${url.toString()}-${fileName.toString()}`,
         url,
-        name,
+        fileName,
         parts,
         resumable,
         size,
@@ -38,7 +49,7 @@ export default function Interface({ downloadDirHandle }) {
     ])
   }, [setDownloadList])
 
-  const removeDownloadEntry = React.useCallback((id) => {
+  const removeDownloadEntry: RemoveDownloadEntryFunction = React.useCallback((id) => {
     setDownloadList(list => (
       list.filter(downloadObj => downloadObj.id !== id)
     ))
@@ -56,7 +67,7 @@ export default function Interface({ downloadDirHandle }) {
           closeFn={closePopup}
           title={popupTitle}
           render={displayPopup} />,
-          document.querySelector("#modal-root")
+          modalElement as Element // Already type guarded it up above
       )}
 
     </div>

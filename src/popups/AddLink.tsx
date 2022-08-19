@@ -1,49 +1,38 @@
 import React from "react"
 import NewFileDialog from "./NewFileDialog"
 
-function reducer(state, action) {
-  switch (action.type) {
+import type {
+  MakePopupFunction,
+  AddNewDownloadEntry
+} from "../types"
 
-    case "LOADING":
-      return {
-        isLoading: true,
-        errorMessage: false
-      }
+interface AddLinkProps {
+  makePopup: MakePopupFunction
+  addNewDownload: AddNewDownloadEntry
+}
 
-    case "INVALID_URL":
-      return {
-        isLoading: false,
-        errorMessage: "That's invalid url. Please check again"
-      }
+interface ReducerState {
+  isLoading: boolean
+  errorMessage: string | null
+}
 
-    case "FAILED_FETCHING": {
-      console.error(action.error)
-      return {
-        isLoading: false,
-        errorMessage: "Failed connecting to the server"
-      }
-    }
+type ReducerActionTypes = "LOADING" | "INVALID_URL" | "FAILED_FETCHING" | "UNEXPECTED_STATUS_CODE"
 
-    case "UNEXPECTED_STATUS_CODE":
-      return {
-        isLoading: false,
-        errorMessage: `Unexpected status code: ${action.status}`
-      }
-
-    default:
-      throw new TypeError(`Unkonwn action type: ${action.type}`)
-  }
+interface ReducerActionObject {
+  type: ReducerActionTypes
+  error?: any
+  status?: number
 }
 
 const initialState = {
   isLoading: false,
-  errorMessage: false
+  errorMessage: null
 }
 
-export default function AddLink({ makePopup, addNewDownload }) {
+export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
-  const URLInput = React.useRef(null)
+  const URLInput = React.useRef<HTMLInputElement>(null)
 
   async function connect() {
 
@@ -51,7 +40,7 @@ export default function AddLink({ makePopup, addNewDownload }) {
 
     try {
 
-      var { href } = new URL(URLInput.current.value)
+      var { href } = new URL(URLInput.current?.value || '')
 
     } catch (error) {
 
@@ -86,13 +75,13 @@ export default function AddLink({ makePopup, addNewDownload }) {
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    const fileSize = res.headers.get("content-length")
+    const fileSize = Number(res.headers.get("content-length"))
     const contentDisposition = res.headers.get("content-disposition")
-    const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop()
+    const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop() || ''
 
     makePopup(
       <NewFileDialog
-        url={res.headers.get("x-wdm-finalurl")}
+        url={new URL(res.headers.get("x-wdm-finalurl") ?? '')}
         makePopup={makePopup}
         addNewDownload={addNewDownload}
         size={fileSize}
@@ -132,4 +121,38 @@ export default function AddLink({ makePopup, addNewDownload }) {
 
     </div>
   )
+}
+
+function reducer(state: ReducerState, action: ReducerActionObject): ReducerState {
+  switch (action.type) {
+
+    case "LOADING":
+      return {
+        isLoading: true,
+        errorMessage: null
+      }
+
+    case "INVALID_URL":
+      return {
+        isLoading: false,
+        errorMessage: "That's invalid url. Please check again"
+      }
+
+    case "FAILED_FETCHING": {
+      console.error(action.error)
+      return {
+        isLoading: false,
+        errorMessage: "Failed connecting to the server"
+      }
+    }
+
+    case "UNEXPECTED_STATUS_CODE":
+      return {
+        isLoading: false,
+        errorMessage: `Unexpected status code: ${action.status}`
+      }
+
+    default:
+      throw new TypeError(`Unkonwn action type: ${action.type}`)
+  }
 }
