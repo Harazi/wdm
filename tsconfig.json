@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS", // For resolving without explicit extension
+    "declaration": true,
+    "strict": true,
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "types": ["@types/wicg-file-system-access"],
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"],
+}
