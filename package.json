@@ -6,13 +6,18 @@
   "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=production node server.js",
-    "dev": "cross-env NODE_ENV=development npm-run-all -p nodemon webpack-watch sass-watch",
-    "build": "cross-env NODE_ENV=production npm run sass-build && npm run webpack-build",
-    "nodemon": "nodemon server.js",
-    "webpack-watch": "webpack --watch",
-    "webpack-build": "webpack --mode production",
-    "sass-watch": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map --watch",
-    "sass-build": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map"
+
+    "dev": "cross-env NODE_ENV=development npm-run-all -p dev:*",
+    "build": "cross-env NODE_ENV=production npm-run-all build:*",
+
+    "dev:nodemon": "nodemon server.js",
+    "dev:server": "tsc -p controller/tsconfig.json --watch",
+    "dev:webpack": "webpack --watch",
+    "dev:sass": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map --watch",
+
+    "build:server": "tsc -p controller/tsconfig.json",
+    "build:webpack": "webpack --mode production",
+    "build:sass": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map"
   },
   "keywords": [
     "Download",
