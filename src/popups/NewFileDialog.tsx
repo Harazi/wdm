@@ -68,7 +68,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
 
         <div className="download-parts label-input-pair">
           <label htmlFor="parts">Download parts</label>
-          <input type="number" id="parts" defaultValue={resumable && 8 || 1} max={8} min={1} readOnly={!resumable} ref={partsNumber} />
+          <input type="number" id="parts" defaultValue={resumable && 6 || 1} max={6} min={1} readOnly={!resumable} ref={partsNumber} />
         </div>
 
       </div>
