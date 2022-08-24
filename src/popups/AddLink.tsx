@@ -38,9 +38,14 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
 
     dispatch({ type: "LOADING" })
 
+    let url = URLInput.current?.value ?? ''
+
+    if (!url.match(/https?:\/\/i/))
+      url = "http://".concat(url)
+
     try {
 
-      var { href } = new URL(URLInput.current?.value || '')
+      var { href } = new URL(url)
 
     } catch (error) {
 
