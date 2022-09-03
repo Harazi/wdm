@@ -13,7 +13,6 @@ const router = express.Router({ strict: true })
 export default router
 
 router.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Headers", "x-wdm")
   res.setHeader("Access-Control-Expose-Headers", "content-length, x-wdm-finalurl")
   next()
 })
