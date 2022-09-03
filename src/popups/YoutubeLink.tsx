@@ -47,7 +47,7 @@ export default function YoutubeLink({ makePopup, addNewDownload }: YoutubeLinkPr
 
     try {
 
-      var res = await fetch(`api/youtube?id=${id}`, {
+      var res = await fetch(`api/youtubeInfo?id=${id}`, {
         redirect: "manual",
         cache: "no-store",
         referrer: "",

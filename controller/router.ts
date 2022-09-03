@@ -18,8 +18,7 @@ router.use((req, res, next) => {
 })
 
 router.get('/api/get', apiGet)
-
-router.get('/api/youtube', apiYoutubeInfo)
+router.get('/api/youtubeInfo', apiYoutubeInfo)
 
 router.get('*', range({
   baseDir: resolve(CWD, "public"),
