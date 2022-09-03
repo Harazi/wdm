@@ -58,12 +58,11 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
         const fileWritable = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: true })
           .then(handle => handle.createWritable({ keepExistingData: false }))
 
-        const res = await fetch("api/get", {
+        const res = await fetch(`api/get?url=${encodeURIComponent(url.href)}`, {
           redirect: "manual",
           cache: "no-store",
           referrer: "",
           headers: {
-            'x-wdm': url.href,
             "range": resumable
               ? `bytes=${fragment.startOffset}-${fragment.startOffset + fragment.fragmentSize}`
               : "bytes=0-"

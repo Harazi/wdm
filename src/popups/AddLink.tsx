@@ -57,12 +57,11 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
 
     try {
 
-      var res = await fetch("api/get", {
+      var res = await fetch(`api/get?url=${encodeURIComponent(href)}`, {
         redirect: "manual",
         cache: "no-store",
         referrer: "",
         headers: {
-          'x-wdm': href,
           range: "bytes=0-",
         },
         signal: abortController.signal,
