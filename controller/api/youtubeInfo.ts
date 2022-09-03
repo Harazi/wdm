@@ -37,7 +37,7 @@ export default async function handler(req: Request, res: Response) {
   const { id } = req.query
 
   if (typeof id !== "string")
-    return res.sendStatus(400)
+    return res.status(400).send("id query parameter is not of type string")
 
   if (!isValidYoutubeID(id))
     return res.status(400).send("invalid id")
@@ -52,10 +52,10 @@ export default async function handler(req: Request, res: Response) {
       },
       body: JSON.stringify(youtubePostData(id))
     }).then(r => r.json())
-  } catch (err) { return res.sendStatus(500) }
+  } catch (err) { return res.status(502).send("failed fetching Youtube api") }
 
   if (!isValidYoutubeResponse(youtubeRes))
-    return res.sendStatus(503)
+    return res.status(502).send("Youtube's server send unkown response")
 
   res.json({
 
