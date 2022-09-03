@@ -54,8 +54,6 @@ export default async function handler(req: Request, res: Response) {
     }).then(r => r.json())
   } catch (err) { return res.sendStatus(500) }
 
-  console.log(youtubeRes)
-
   if (!isValidYoutubeResponse(youtubeRes))
     return res.sendStatus(503)
 
