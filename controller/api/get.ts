@@ -1,5 +1,11 @@
-import defaultUserAgent from "../utils/defaultUserAgent.js"
+import { Readable } from "node:stream"
+import {
+  allowedRequestHeaders,
+  allowedResponseHeaders,
+  enforcedRequestHeaders
+} from "../utils/headers.js"
 
+import type { ReadableStream } from "node:stream/web"
 import type {
   Request,
   Response
@@ -7,50 +13,51 @@ import type {
 
 export default function handler(req: Request, res: Response) {
 
-  const href = req.headers["x-wdm"]
+  const { url: urlParam } = req.query
 
-  if (typeof href !== "string")
-    return res.sendStatus(400)
-
-  delete req.headers["x-wdm"]
+  if (typeof urlParam !== "string")
+    return res.status(400).send("url query parameter is not of type string")
 
   let url: URL
 
-  try { url = new URL(href) }
-  catch (err) { return res.sendStatus(400) }
+  try { url = new URL(urlParam) }
+  catch (err) { return res.status(400).send("invalid url") }
+
+  const fetchHeaders = new Headers()
+
+  allowedRequestHeaders.forEach(header => {
+    const reqHeader = req.headers[header]
+    if (typeof reqHeader === "string")
+      fetchHeaders.set(header, reqHeader)
+  })
+
+  fetchHeaders.set("host", url.host)
+  fetchHeaders.set("origin", url.origin)
+  fetchHeaders.set("referer", url.origin.concat('/'))
+
+  enforcedRequestHeaders.forEach(([key, value]) => fetchHeaders.set(key, value))
 
   fetch(url, {
     redirect: "follow",
-    headers: {
-      'user-agent': req.headers["user-agent"] ?? defaultUserAgent,
-      Host: url.host,
-      Origin: url.origin,
-      referer: url.origin.concat('/'),
-    }
+    headers: fetchHeaders
   })
     .then(async serverRes => {
 
       if (!serverRes.body)
-        return res.sendStatus(503)
+        return res.status(502).send("the intended server did not send response body")
 
-      serverRes.headers.append("x-wdm-finalurl", serverRes.url)
-      serverRes.headers.delete("set-cookie")
+      const responseHeaders = {} as any
 
-      res.writeHead(serverRes.status, serverRes.statusText, ...serverRes.headers)
+      allowedResponseHeaders.forEach(header => {
+        if (serverRes.headers.has(header))
+          responseHeaders[header] = serverRes.headers.get(header)
+      })
 
-      const reader = serverRes.body.getReader()
+      responseHeaders["x-wdm-finalurl"] = serverRes.url
 
-      while (true) {
+      res.writeHead(serverRes.status, serverRes.statusText, responseHeaders)
 
-        const { done, value } = await reader.read()
-
-        if (done) {
-          res.end()
-          break
-        }
-
-        res.write(value)
-      }
+      Readable.fromWeb(serverRes.body as ReadableStream).pipe(res)
     })
-    .catch(err => !res.headersSent && res.sendStatus(500))
+    .catch(err => !res.headersSent && res.status(500).json(err))
 }
