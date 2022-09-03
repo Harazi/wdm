@@ -5,7 +5,8 @@ export const enforcedRequestHeaders = [
 export const enforcedResponseHeaders = []
 
 export const allowedRequestHeaders = [
-  "range"
+  "range",
+  "user-agent",
 ]
 
 export const allowedResponseHeaders = [
