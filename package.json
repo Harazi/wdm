@@ -10,7 +10,7 @@
     "dev": "cross-env NODE_ENV=development npm-run-all -p dev:*",
     "build": "cross-env NODE_ENV=production npm-run-all build:*",
 
-    "dev:nodemon": "nodemon server.js",
+    "dev:nodemon": "nodemon --trace-warnings server.js",
     "dev:server": "tsc -p controller/tsconfig.json --watch",
     "dev:webpack": "webpack --watch",
     "dev:sass": "sass sass/style.scss public/stylesheets/style.min.css -s compressed --no-source-map --watch",
