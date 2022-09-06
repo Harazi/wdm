@@ -82,6 +82,7 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
     const fileSize = Number(res.headers.get("content-length"))
     const contentDisposition = res.headers.get("content-disposition")
     const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop() || ''
+    const resumable = Boolean(res.status === 206 && res.headers.has("accept-ranges") && Number(fileSize) > 0)
 
     makePopup(
       <NewFileDialog
@@ -90,7 +91,7 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
         addNewDownload={addNewDownload}
         size={fileSize}
         defaultName={fileDefaultName}
-        resumable={res.status === 206 && Number(fileSize) > 0} />,
+        resumable={resumable} />,
       "File information"
     )
 
