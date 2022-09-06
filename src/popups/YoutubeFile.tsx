@@ -1,5 +1,6 @@
 import React from "react"
 import prettyMS from "pretty-ms"
+import { format } from "bytes"
 import { humanNumber } from "../utils/humanNumber"
 
 import type {
@@ -17,8 +18,33 @@ interface YoutubeFileProps {
 export default function YoutubeFile({ makePopup, addNewDownload, details }: YoutubeFileProps) {
 
   const [videoFormat, setVideoFormat] = React.useState(0)
+  const [formatsSize, setFormatsSize] = React.useState<number[]>([])
 
   const videoFileNameInput = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    const videoIndex = videoFormat
+    if (videoIndex in formatsSize)
+      return
+
+    const abortController = new AbortController()
+    let aborted = false
+
+    fetch(`api/get?url=${encodeURIComponent(details.formats[videoIndex].url)}`, { signal: abortController.signal })
+      .then(res => {
+        const videoSize = res.headers.get("content-length")
+        setFormatsSize(prevFormatsSize => {
+          const formatsSize = [...prevFormatsSize]
+          formatsSize[videoIndex] = Number(videoSize)
+          return formatsSize
+        })
+        abortController.abort()
+        aborted = true
+        console.log(details.formats[videoIndex].qualityLabel, Number(videoSize))
+      })
+
+    return () => aborted === false ? abortController.abort() : undefined
+  }, [videoFormat])
 
   function startDownload() {
 
@@ -53,7 +79,8 @@ export default function YoutubeFile({ makePopup, addNewDownload, details }: Yout
               { colonNotation: true }
             )}</div>
             •
-            <div className="views" title="views count">{humanNumber(Number(details.viewCount), 1)}</div>
+            <div className="views" title="views count">views: {humanNumber(Number(details.viewCount), 1)}</div>
+            <div title="video size">{formatsSize[videoFormat] ? `size: ${format(formatsSize[videoFormat], { unitSeparator: ' ' })}` : "size: ..."}</div>
           </div>
 
         </div>
