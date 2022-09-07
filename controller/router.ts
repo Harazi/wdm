@@ -5,6 +5,7 @@ import range from "@ceicc/range"
 
 import apiGet from "./api/get.js"
 import apiYoutubeInfo from "./api/youtubeInfo.js"
+import linkInfo from "./api/linkInfo.js"
 
 const CWD = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 
@@ -19,6 +20,7 @@ router.use((req, res, next) => {
 
 router.get('/api/get', apiGet)
 router.get('/api/youtubeInfo', apiYoutubeInfo)
+router.get('/api/linkInfo', linkInfo)
 
 router.get('*', range({
   baseDir: resolve(CWD, "public"),
