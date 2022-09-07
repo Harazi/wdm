@@ -1,4 +1,4 @@
-export const enforcedRequestHeaders = [
+export const enforcedRequestHeaders: [string, string][] = [
   ["accept-encoding", "*;q=0"]
 ]
 
