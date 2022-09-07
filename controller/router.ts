@@ -24,7 +24,3 @@ router.get('*', range({
   baseDir: resolve(CWD, "public"),
   maxAge: process.env.NODE_ENV === "production" ? 86400 : 0
 }))
-
-// router.get("*", express.static(resolve(CWD, "/public"), {
-//   maxAge: process.env.NODE_ENV === "production" ? 86400000 : 0,
-// }))
