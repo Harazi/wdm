@@ -1,13 +1,19 @@
 main {
   #download-list {
+    padding: 1em;
+
     ul {
       display: grid;
       grid-auto-rows: 80px;
+      row-gap: 0.5em;
 
       li {
         display: grid;
         position: relative;
         padding: 0.5em;
+        background-color: #155e75;
+        color: white;
+        border-radius: 0.5em;
         grid-template-areas:
           "filename filename controll-buttons controll-buttons"
           "filename filename controll-buttons controll-buttons"
@@ -20,7 +26,7 @@ main {
 
         .download-url {
           grid-area: download-url;
-          color: rgba(128, 128, 128, 0.7);
+          color: #ffffff80;
           text-overflow: ellipsis;
           overflow: hidden;
           font-size: 0.6rem;

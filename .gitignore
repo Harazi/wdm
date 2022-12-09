@@ -3,3 +3,5 @@ public/stylesheets
 public/js
 package-lock.json
 controller-js
+pnpm-lock.yaml
+yarn.lock
