@@ -1,23 +1,7 @@
 import React from "react"
+import { get, set } from "idb-keyval"
 import type { DirHandleSetter } from "./App"
 
-async function selectDownloadDirectory(setDownloadDirHandle: DirHandleSetter) {
-
-  try {
-    // Get the directory access
-    const dirHandle = await showDirectoryPicker({ startIn: "downloads" })
-
-    // Get read/write permissions
-    await dirHandle.getFileHandle(".wdm", { create: true })
-    await dirHandle.removeEntry(".wdm")
-
-    setDownloadDirHandle(dirHandle)
-  } catch (error) {
-    console.error(error)
-    setDownloadDirHandle(null)
-  }
-
-}
 export default function GetDirHandle({ dirHandleSetter }: { dirHandleSetter: DirHandleSetter }) {
   return (
     <div className="get-dir-handle-container">
@@ -26,4 +10,40 @@ export default function GetDirHandle({ dirHandleSetter }: { dirHandleSetter: Dir
       </button>
     </div>
   )
+}
+
+async function selectDownloadDirectory(setDownloadDirHandle: DirHandleSetter) {
+  try {
+    // Get the directory access
+    let dirHandle = await get('downloadDir')
+    if (!dirHandle) {
+      dirHandle = await showDirectoryPicker({ startIn: "downloads" })
+      await set('downloadDir', dirHandle)
+    }
+
+    // Get read/write permissions
+    if (await verifyPermission(dirHandle, true)) {
+      setDownloadDirHandle(dirHandle)
+    }
+  } catch (error) {
+    console.error(error)
+    setDownloadDirHandle(null)
+  }
+}
+
+async function verifyPermission(fileHandle: FileSystemHandle, readWrite: boolean) {
+  const options: { mode?: 'readwrite' } = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  // Check if permission was already granted. If so, return true.
+  if ((await fileHandle.queryPermission(options)) === 'granted') {
+    return true;
+  }
+  // Request permission. If the user grants permission, return true.
+  if ((await fileHandle.requestPermission(options)) === 'granted') {
+    return true;
+  }
+  // The user didn't grant permission, so return false.
+  return false;
 }
