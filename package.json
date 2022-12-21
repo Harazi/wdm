@@ -32,6 +32,7 @@
     "cross-env": "~7.0.3",
     "divrem": "~1.0.3",
     "express": "~4.18.1",
+    "idb-keyval": "~6.2.0",
     "mime-types": "~2.1.35",
     "pretty-ms": "~8.0.0"
   },
