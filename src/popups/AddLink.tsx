@@ -110,7 +110,8 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
             ref={URLInput}
             disabled={state.isLoading}
             placeholder={"https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"}
-            autoFocus />
+            autoFocus
+            onKeyDown={(e) => e.key === "Enter" && connect()} />
         </div>
 
         <div className="confirm">
@@ -120,9 +121,9 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
       </div>
 
       {state.errorMessage &&
-      <div className="error-displayer">
-        <p>{state.errorMessage}</p>
-      </div>}
+        <div className="error-displayer">
+          <p>{state.errorMessage}</p>
+        </div>}
 
     </div>
   )
