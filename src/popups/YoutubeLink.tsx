@@ -86,7 +86,8 @@ export default function YoutubeLink({ makePopup, addNewDownload }: YoutubeLinkPr
             ref={URLInput}
             disabled={state.isLoading}
             placeholder={"youtu.be/Sklc_fQBmcs"}
-            autoFocus />
+            autoFocus
+            onKeyDown={(e) => e.key === "Enter" && connect()} />
         </div>
 
         <div className="confirm">

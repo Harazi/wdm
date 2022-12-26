@@ -1,4 +1,5 @@
-import React, { HTMLAttributes } from "react"
+import React from "react"
+import type { MouseEventHandler, KeyboardEventHandler } from "react"
 
 interface PopupProps {
   render: React.ReactNode,
@@ -10,16 +11,25 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
 
   const [classN, setClassN] = React.useState("open")
 
-  const click: React.MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
+  function closeModal() {
+    setClassN("closed") // Starts the animation
+
+    const timeoutID = setTimeout(closeFn, 500) // Close after 0.5s to get animation
+    return (() => clearTimeout(timeoutID))
+  }
+
+  const click: MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
     if (
       !(e.target as Element).closest(".close-button")
       && (e.target as Element).closest(".popup-box")
     ) return // Clicked inside the box
 
-    setClassN("closed") // Starts the animation
+    closeModal()
+  }
 
-    const timeoutID = setTimeout(closeFn, 500) // Close after 0.5s to get animation
-    return (() => clearTimeout(timeoutID))
+  const keyDown: KeyboardEventHandler = (e) => {
+    if (e.key === "Escape")
+      closeModal()
   }
 
   React.useEffect(() => {
@@ -27,7 +37,7 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
   }, [render])
 
   return render ? (
-    <div id="popup" className={classN} onMouseDown={click}>
+    <div id="popup" className={classN} onMouseDown={click} onKeyDown={keyDown}>
 
       <div className="popup-box">
 
