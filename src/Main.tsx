@@ -9,10 +9,9 @@ import type {
 interface MainProps {
   downloadList: DownloadEntryProperties[]
   removeDownloadEntry: RemoveDownloadEntryFunction
-  downloadDirHandle: FileSystemDirectoryHandle
 }
 
-export default React.memo(function Main({ downloadList, removeDownloadEntry, downloadDirHandle }: MainProps) {
+export default React.memo(function Main({ downloadList, removeDownloadEntry }: MainProps) {
   return (
     <main>
       <div id="download-list">
@@ -22,8 +21,7 @@ export default React.memo(function Main({ downloadList, removeDownloadEntry, dow
             <DownloadEntry
               key={downloadObj.id}
               {...downloadObj}
-              removeDownloadEntry={removeDownloadEntry}
-              downloadDirHandle={downloadDirHandle} />
+              removeDownloadEntry={removeDownloadEntry} />
           ))}
 
         </ul>

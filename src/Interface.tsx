@@ -17,7 +17,7 @@ const modalElement = document.querySelector("#modal-root")
 if (!modalElement)
   throw new Error("No modual element found!")
 
-export default function Interface({ downloadDirHandle }: { downloadDirHandle: FileSystemDirectoryHandle }) {
+export default function Interface() {
 
   const [displayPopup, setDisplayPopup] = React.useState<React.ReactNode | null>(null)
   const [popupTitle, setPopupTitle] = React.useState("")
@@ -58,16 +58,16 @@ export default function Interface({ downloadDirHandle }: { downloadDirHandle: Fi
   return (
     <div className="main-container">
 
-      <Aside {...{makePopup, addNewDownload}} />
+      <Aside {...{ makePopup, addNewDownload }} />
 
-      <Main {...{downloadList, removeDownloadEntry, downloadDirHandle}} />
+      <Main {...{ downloadList, removeDownloadEntry }} />
 
       {ReactDOM.createPortal(
         <Popup
           closeFn={closePopup}
           title={popupTitle}
           render={displayPopup} />,
-          modalElement as Element // Already type guarded it up above
+        modalElement as Element // Already type guarded it up above
       )}
 
     </div>

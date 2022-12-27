@@ -1,6 +1,7 @@
 import React from "react"
 import { divrem } from "divrem"
 import { streamToFile } from "../utils/streamToFile"
+import { dlDir } from "../utils/fs"
 import { DownloadSummary } from "./DownloadSummary"
 
 import type {
@@ -10,10 +11,9 @@ import type {
 
 interface DownloadEntryProps extends DownloadEntryProperties {
   removeDownloadEntry: RemoveDownloadEntryFunction
-  downloadDirHandle: FileSystemDirectoryHandle
 }
 
-export default function DownloadEntry({ id, url, fileName, parts, resumable, size, removeDownloadEntry, downloadDirHandle }: DownloadEntryProps) {
+export default function DownloadEntry({ id, url, fileName, parts, resumable, size, removeDownloadEntry }: DownloadEntryProps) {
 
   const startTime = React.useRef(Date.now())
   const endTime = React.useRef<number | null>(null)
@@ -55,6 +55,8 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
 
       (async () => {
 
+        const downloadDirHandle = await dlDir()
+
         const fileWritable = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: true })
           .then(handle => handle.createWritable({ keepExistingData: false }))
 
@@ -75,7 +77,8 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
 
         const reader = res.body.getReader()
 
-        streamToFile({ reader, writable: fileWritable,
+        streamToFile({
+          reader, writable: fileWritable,
           on: {
             progress: length => {
               totalDownloadSize.current += length
@@ -118,29 +121,32 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
 
     const allFinishedDownloading = partsState.reduce((finished, fragment) => {
       if (!finished) // At least one part did not finish
-      return false
+        return false
       else
-      return fragment.finished
+        return fragment.finished
     }, true)
 
     if (!allFinishedDownloading)
-    return
+      return
 
     console.log("passed allFinishedDownloading test: inside useEffect")
 
-    ;(async () => {
+      ; (async () => {
 
-      const fileWritable = await downloadDirHandle.getFileHandle(fileName, { create: true })
-        .then(handle => handle.createWritable({ keepExistingData: false }))
+        const downloadDirHandle = await dlDir()
 
-      const promisesArray = partsState.map( async fragment => new Promise(async (resolve, reject) => {
+        const fileWritable = await downloadDirHandle.getFileHandle(fileName, { create: true })
+          .then(handle => handle.createWritable({ keepExistingData: false }))
 
-        const fragmentReader = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: false })
-          .then(handle => handle.getFile())
-          .then(file => file.stream())
-          .then(stream => stream.getReader())
+        const promisesArray = partsState.map(async fragment => new Promise(async (resolve, reject) => {
 
-          streamToFile({ reader: fragmentReader, writable: fileWritable,
+          const fragmentReader = await downloadDirHandle.getFileHandle(`${fileName}.part${fragment.index}`, { create: false })
+            .then(handle => handle.getFile())
+            .then(file => file.stream())
+            .then(stream => stream.getReader())
+
+          streamToFile({
+            reader: fragmentReader, writable: fileWritable,
             on: {
               finish: () => {
                 endTime.current = Date.now()
@@ -150,17 +156,17 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
             }
           })
 
-      }))
+        }))
 
-      for (const fragmentWritePromise of promisesArray) {
-        await fragmentWritePromise
-      }
+        for (const fragmentWritePromise of promisesArray) {
+          await fragmentWritePromise
+        }
 
-      fileWritable.close()
+        fileWritable.close()
 
-      setFinishedDownloading(true)
+        setFinishedDownloading(true)
 
-    })()
+      })()
 
   }, [partsState])
 
@@ -172,7 +178,7 @@ export default function DownloadEntry({ id, url, fileName, parts, resumable, siz
         {partsState.map(fragment => (
           <span
             className={`fragment ${fragment.finished && "finished"}`}
-            style={{"--fragment-download-progress": `${fragment.downloadedBytes / fragment.fragmentSize * 100}%` } as React.CSSProperties}
+            style={{ "--fragment-download-progress": `${fragment.downloadedBytes / fragment.fragmentSize * 100}%` } as React.CSSProperties}
             key={fragment.index}>
           </span>))}
       </div>
