@@ -9,7 +9,7 @@
   backdrop-filter: blur(2px);
 
   &.open .modal-box {
-    animation: modal-box-open 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+    animation: modal-box-open 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53) forwards;
 
     @keyframes modal-box-open {
       from {
@@ -25,7 +25,7 @@
   }
 
   &.closed .modal-box {
-    animation: modal-box-closed 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+    animation: modal-box-closed 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53) forwards;
 
     @keyframes modal-box-closed {
       from {
