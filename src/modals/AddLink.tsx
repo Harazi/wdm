@@ -1,15 +1,6 @@
 import React from "react"
-import NewFileDialog from "./NewFileDialog"
-
-import type {
-  MakeModalFunction,
-  AddNewDownloadEntry
-} from "../types"
-
-interface AddLinkProps {
-  makeModal: MakeModalFunction
-  addNewDownload: AddNewDownloadEntry
-}
+import Modal from "../Modal"
+import { useModal, register, create } from "@ebay/nice-modal-react"
 
 interface ReducerState {
   isLoading: boolean
@@ -29,8 +20,10 @@ const initialState = {
   errorMessage: null
 }
 
-export default function AddLink({ makeModal, addNewDownload }: AddLinkProps) {
 
+const AddLink = create(() => {
+
+  const modal = useModal()
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const URLInput = React.useRef<HTMLInputElement>(null)
 
@@ -79,55 +72,62 @@ export default function AddLink({ makeModal, addNewDownload }: AddLinkProps) {
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    const fileSize = Number(res.headers.get("content-length"))
     const contentDisposition = res.headers.get("content-disposition")
-    const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop() || ''
-    const resumable = Boolean(res.status === 206 && res.headers.has("accept-ranges") && Number(fileSize) > 0)
+    const fileSize = Number(res.headers.get("content-length"))
 
-    makeModal(
-      <NewFileDialog
-        url={new URL(res.headers.get("x-wdm-finalurl") ?? '')}
-        makeModal={makeModal}
-        addNewDownload={addNewDownload}
-        size={fileSize}
-        defaultName={fileDefaultName}
-        resumable={resumable} />,
-      "File information"
-    )
+    modal.resolve({
+      fileSize,
+      contentDisposition,
+      fileDefaultName: contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop() || '',
+      resumable: Boolean(res.status === 206 && res.headers.has("accept-ranges") && Number(fileSize) > 0),
+      url: new URL(res.headers.get("x-wdm-finalurl") ?? ''),
+    })
+
 
   }
 
   return (
-    <div className="connect-to-url">
+    <Modal
+      title="Download anything from the web"
+      visible={modal.visible}
+      onClose={modal.hide}
+      afterClose={modal.remove}>
+      <div className="connect-to-url">
 
-      <div className="main-inputs">
+        <div className="main-inputs">
 
-        <div className="label-input-pair">
-          <label htmlFor="URL-input">Downlaod link</label>
-          <input
-            type="url"
-            id="URL-input"
-            ref={URLInput}
-            disabled={state.isLoading}
-            placeholder={"https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"}
-            autoFocus
-            onKeyDown={(e) => e.key === "Enter" && connect()} />
+          <div className="label-input-pair">
+            <label htmlFor="URL-input">Downlaod link</label>
+            <input
+              type="url"
+              id="URL-input"
+              ref={URLInput}
+              disabled={state.isLoading}
+              placeholder={"https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"}
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && connect()} />
+          </div>
+
+          <div className="confirm">
+            <button type="button" onClick={connect} disabled={state.isLoading}>Connect</button>
+          </div>
+
         </div>
 
-        <div className="confirm">
-          <button type="button" onClick={connect} disabled={state.isLoading}>Connect</button>
-        </div>
+        {state.errorMessage &&
+          <div className="error-displayer">
+            <p>{state.errorMessage}</p>
+          </div>}
 
       </div>
-
-      {state.errorMessage &&
-        <div className="error-displayer">
-          <p>{state.errorMessage}</p>
-        </div>}
-
-    </div>
+    </Modal>
   )
-}
+})
+
+export default AddLink
+export const AddLinkModalID = 'ADD_LINK'
+
+register(AddLinkModalID, AddLink)
 
 function reducer(state: ReducerState, action: ReducerActionObject): ReducerState {
   switch (action.type) {
