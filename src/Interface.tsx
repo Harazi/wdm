@@ -2,12 +2,12 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Aside from "./aside/Aside"
 import Main from "./Main"
-import Popup from "./Popup"
+import Modal from "./Modal"
 
 import type {
   DownloadEntryProperties,
-  MakePopupFunction,
-  ClosePopupFunction,
+  MakeModalFunction,
+  CloseModalFunction,
   AddNewDownloadEntry,
   RemoveDownloadEntryFunction
 } from "./types"
@@ -15,23 +15,23 @@ import type {
 const modalElement = document.querySelector("#modal-root")
 
 if (!modalElement)
-  throw new Error("No modual element found!")
+  throw new Error("No modal element found!")
 
 export default function Interface() {
 
-  const [displayPopup, setDisplayPopup] = React.useState<React.ReactNode | null>(null)
-  const [popupTitle, setPopupTitle] = React.useState("")
+  const [displayModal, setDisplayModal] = React.useState<React.ReactNode | null>(null)
+  const [modalTitle, setModalTitle] = React.useState("")
   const [downloadList, setDownloadList] = React.useState<DownloadEntryProperties[]>([])
 
-  const makePopup: MakePopupFunction = React.useCallback((component, title) => {
-    setDisplayPopup(component)
-    setPopupTitle(title)
-  }, [setDisplayPopup, setPopupTitle])
+  const makeModal: MakeModalFunction = React.useCallback((component, title) => {
+    setDisplayModal(component)
+    setModalTitle(title)
+  }, [setDisplayModal, setModalTitle])
 
-  const closePopup: ClosePopupFunction = React.useCallback(() => {
-    setDisplayPopup(null)
-    setPopupTitle("")
-  }, [setDisplayPopup, setPopupTitle])
+  const closeModal: CloseModalFunction = React.useCallback(() => {
+    setDisplayModal(null)
+    setModalTitle("")
+  }, [setDisplayModal, setModalTitle])
 
   const addNewDownload: AddNewDownloadEntry = React.useCallback((url, fileName, parts, resumable, size) => {
     // TODO: save the download state in the list
@@ -58,15 +58,15 @@ export default function Interface() {
   return (
     <div className="main-container">
 
-      <Aside {...{ makePopup, addNewDownload }} />
+      <Aside {...{ makeModal, addNewDownload }} />
 
       <Main {...{ downloadList, removeDownloadEntry }} />
 
       {ReactDOM.createPortal(
-        <Popup
-          closeFn={closePopup}
-          title={popupTitle}
-          render={displayPopup} />,
+        <Modal
+          closeFn={closeModal}
+          title={modalTitle}
+          render={displayModal} />,
         modalElement as Element // Already type guarded it up above
       )}
 

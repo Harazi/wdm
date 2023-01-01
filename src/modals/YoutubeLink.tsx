@@ -3,12 +3,12 @@ import YoutubeFile from "./YoutubeFile"
 import { isValidYoutubeURL } from "../utils/isValidYoutubeURL"
 
 import type {
-  MakePopupFunction,
+  MakeModalFunction,
   AddNewDownloadEntry
 } from "../types"
 
 interface YoutubeLinkProps {
-  makePopup: MakePopupFunction
+  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
 }
 
@@ -30,7 +30,7 @@ const initialState: ReducerState = {
   errorMessage: null
 }
 
-export default function YoutubeLink({ makePopup, addNewDownload }: YoutubeLinkProps) {
+export default function YoutubeLink({ makeModal, addNewDownload }: YoutubeLinkProps) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -64,10 +64,10 @@ export default function YoutubeLink({ makePopup, addNewDownload }: YoutubeLinkPr
     if (!(res.status === 200 || res.status === 206))
       return dispatch({ type: "UNEXPECTED_STATUS_CODE", status: res.status })
 
-    makePopup(
+    makeModal(
       <YoutubeFile
         details={details}
-        makePopup={makePopup}
+        makeModal={makeModal}
         addNewDownload={addNewDownload} />,
       "Video information"
     )

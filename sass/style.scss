@@ -4,8 +4,8 @@
 @use "interface";
 @use "aside/aside";
 @use "main/main";
-@use "popup/popup";
-@use "popup/popups";
+@use "modal/modal";
+@use "modal/modals";
 
 :root {
   --html-font-size: 1.3rem;
@@ -30,7 +30,7 @@ ul,
 ul li,
 ol,
 ol li {
-  margin:0;
+  margin: 0;
   padding: 0;
   text-indent: 0;
   list-style: none;

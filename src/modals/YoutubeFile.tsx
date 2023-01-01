@@ -4,18 +4,18 @@ import { format } from "bytes"
 import { humanNumber } from "../utils/humanNumber"
 
 import type {
-  MakePopupFunction,
+  MakeModalFunction,
   AddNewDownloadEntry,
   YoutubeApiResponse
 } from "../types"
 
 interface YoutubeFileProps {
-  makePopup: MakePopupFunction
+  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
   details: YoutubeApiResponse
 }
 
-export default function YoutubeFile({ makePopup, addNewDownload, details }: YoutubeFileProps) {
+export default function YoutubeFile({ makeModal, addNewDownload, details }: YoutubeFileProps) {
 
   const [videoFormat, setVideoFormat] = React.useState(0)
   const [formatsSize, setFormatsSize] = React.useState<number[]>([])
@@ -54,7 +54,7 @@ export default function YoutubeFile({ makePopup, addNewDownload, details }: Yout
 
     addNewDownload(new URL(details.formats[videoFormat].url), fileName, 1, false, null)
 
-    makePopup(null, '')
+    makeModal(null, '')
   }
 
   return (
@@ -129,7 +129,7 @@ export default function YoutubeFile({ makePopup, addNewDownload, details }: Yout
       <div className="controll-buttons">
 
         <div className="button-container cancel">
-          <button type="button" onClick={() => makePopup(null, '')}>Cancel</button>
+          <button type="button" onClick={() => makeModal(null, '')}>Cancel</button>
         </div>
 
         <div className="button-container start">

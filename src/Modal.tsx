@@ -1,13 +1,13 @@
 import React from "react"
 import type { MouseEventHandler, KeyboardEventHandler } from "react"
 
-interface PopupProps {
+interface ModalProps {
   render: React.ReactNode,
   title: string,
   closeFn: VoidFunction
 }
 
-export default React.memo(function Popup({ render, title, closeFn }: PopupProps) {
+export default React.memo(function Modal({ render, title, closeFn }: ModalProps) {
 
   const [classN, setClassN] = React.useState("open")
 
@@ -21,7 +21,7 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
   const click: MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
     if (
       !(e.target as Element).closest(".close-button")
-      && (e.target as Element).closest(".popup-box")
+      && (e.target as Element).closest(".modal-box")
     ) return // Clicked inside the box
 
     closeModal()
@@ -37,9 +37,9 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
   }, [render])
 
   return render ? (
-    <div id="popup" className={classN} onMouseDown={click} onKeyDown={keyDown}>
+    <div id="modal" className={classN} onMouseDown={click} onKeyDown={keyDown}>
 
-      <div className="popup-box">
+      <div className="modal-box">
 
         <div className="titlebar">
 

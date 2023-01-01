@@ -1,19 +1,19 @@
 import React from "react"
 import Nav from "./Nav"
-import AddLink from "../popups/AddLink"
-import YoutubeLink from "../popups/YoutubeLink"
+import AddLink from "../modals/AddLink"
+import YoutubeLink from "../modals/YoutubeLink"
 
 import type {
-  MakePopupFunction,
+  MakeModalFunction,
   AddNewDownloadEntry
 } from "../types"
 
 interface AsideProps {
-  makePopup: MakePopupFunction
+  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
 }
 
-export default React.memo(function Asside({ makePopup, addNewDownload }: AsideProps) {
+export default React.memo(function Asside({ makeModal, addNewDownload }: AsideProps) {
   return (
     <aside>
 
@@ -26,15 +26,15 @@ export default React.memo(function Asside({ makePopup, addNewDownload }: AsidePr
       <Nav>
 
         <li
-          onClick={() => makePopup(
-            <AddLink makePopup={makePopup} addNewDownload={addNewDownload} />,
+          onClick={() => makeModal(
+            <AddLink makeModal={makeModal} addNewDownload={addNewDownload} />,
             "Download anything from the web")}>
           Add Link
         </li>
 
         <li
-          onClick={() => makePopup(
-            <YoutubeLink makePopup={makePopup} addNewDownload={addNewDownload} />,
+          onClick={() => makeModal(
+            <YoutubeLink makeModal={makeModal} addNewDownload={addNewDownload} />,
             "Download videos from Youtube"
           )}>
           From Youtube

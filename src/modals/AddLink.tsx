@@ -2,12 +2,12 @@ import React from "react"
 import NewFileDialog from "./NewFileDialog"
 
 import type {
-  MakePopupFunction,
+  MakeModalFunction,
   AddNewDownloadEntry
 } from "../types"
 
 interface AddLinkProps {
-  makePopup: MakePopupFunction
+  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
 }
 
@@ -29,7 +29,7 @@ const initialState = {
   errorMessage: null
 }
 
-export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
+export default function AddLink({ makeModal, addNewDownload }: AddLinkProps) {
 
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const URLInput = React.useRef<HTMLInputElement>(null)
@@ -84,10 +84,10 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
     const fileDefaultName = contentDisposition ? contentDisposition.split("filename=")[1] : href.split("/").pop() || ''
     const resumable = Boolean(res.status === 206 && res.headers.has("accept-ranges") && Number(fileSize) > 0)
 
-    makePopup(
+    makeModal(
       <NewFileDialog
         url={new URL(res.headers.get("x-wdm-finalurl") ?? '')}
-        makePopup={makePopup}
+        makeModal={makeModal}
         addNewDownload={addNewDownload}
         size={fileSize}
         defaultName={fileDefaultName}

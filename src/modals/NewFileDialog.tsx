@@ -2,24 +2,24 @@ import React from "react"
 import { format } from "bytes"
 
 import type {
-  MakePopupFunction,
+  MakeModalFunction,
   AddNewDownloadEntry
 } from "../types"
 
 interface NewFileDialogProps {
   url: URL
-  makePopup: MakePopupFunction
+  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
   size: number | null
   defaultName: string
   resumable: boolean
 }
 
-export default function NewFileDialog({ url, makePopup, addNewDownload, size, defaultName, resumable }: NewFileDialogProps) {
+export default function NewFileDialog({ url, makeModal, addNewDownload, size, defaultName, resumable }: NewFileDialogProps) {
 
   const fileNameInput = React.useRef<HTMLInputElement>(null),
-        extensionInput = React.useRef<HTMLInputElement>(null),
-        partsNumber = React.useRef<HTMLInputElement>(null)
+    extensionInput = React.useRef<HTMLInputElement>(null),
+    partsNumber = React.useRef<HTMLInputElement>(null)
 
   function startDownload() {
 
@@ -30,7 +30,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
 
     addNewDownload(url, name, Number(parts), resumable, Number(size))
 
-    makePopup(null, '')
+    makeModal(null, '')
   }
 
   return (
@@ -76,7 +76,7 @@ export default function NewFileDialog({ url, makePopup, addNewDownload, size, de
       <div className="controll-buttons">
 
         <div className="button-container cancel">
-          <button type="button" onClick={() => makePopup(null, '')}>Cancel</button>
+          <button type="button" onClick={() => makeModal(null, '')}>Cancel</button>
         </div>
 
         <div className="button-container start">

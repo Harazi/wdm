@@ -9,8 +9,8 @@ export interface DownloadEntryProperties {
   parts: number
 }
 
-export type MakePopupFunction = (component: ReactNode, title: string) => void
-export type ClosePopupFunction = VoidFunction
+export type MakeModalFunction = (component: ReactNode, title: string) => void
+export type CloseModalFunction = VoidFunction
 export type AddNewDownloadEntry = (url: URL, name: string, parts: number, resumable: boolean, size: number | null) => void
 export type RemoveDownloadEntryFunction = (id: string) => void
 
