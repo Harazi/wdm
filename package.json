@@ -27,6 +27,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@ceicc/range": "~3.0.1",
+    "@ebay/nice-modal-react": "~1.2.8",
     "axios": "~0.27.2",
     "bytes": "~3.1.2",
     "cross-env": "~7.0.3",
