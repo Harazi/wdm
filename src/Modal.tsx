@@ -2,20 +2,22 @@ import React from "react"
 import type { MouseEventHandler, KeyboardEventHandler } from "react"
 
 interface ModalProps {
-  render: React.ReactNode,
+  children: React.ReactNode,
   title: string,
-  closeFn: VoidFunction
+  onClose: VoidFunction,
+  afterClose: VoidFunction,
+  visible: boolean,
 }
 
-export default React.memo(function Modal({ render, title, closeFn }: ModalProps) {
+export default React.memo(function Modal({ children, title, onClose, afterClose, visible }: ModalProps) {
 
-  const [classN, setClassN] = React.useState("open")
+  const closeTimer = React.useRef(0)
 
   function closeModal() {
-    setClassN("closed") // Starts the animation
+    if (closeTimer.current) return
 
-    const timeoutID = setTimeout(closeFn, 500) // Close after 0.5s to get animation
-    return (() => clearTimeout(timeoutID))
+    onClose() // Starts the animation
+    closeTimer.current = setTimeout(afterClose, 500) // remove from tree after 0.5s to get animation
   }
 
   const click: MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
@@ -32,12 +34,8 @@ export default React.memo(function Modal({ render, title, closeFn }: ModalProps)
       closeModal()
   }
 
-  React.useEffect(() => {
-    setClassN("open")
-  }, [render])
-
-  return render ? (
-    <div id="modal" className={classN} onMouseDown={click} onKeyDown={keyDown}>
+  return (
+    <div id="modal" className={visible ? "open" : "closed"} onMouseDown={click} onKeyDown={keyDown}>
 
       <div className="modal-box">
 
@@ -55,12 +53,12 @@ export default React.memo(function Modal({ render, title, closeFn }: ModalProps)
 
         <section className="content">
 
-          {render}
+          {children}
 
         </section>
 
       </div>
 
     </div>
-  ) : null
+  )
 })
