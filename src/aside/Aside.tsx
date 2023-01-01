@@ -1,19 +1,18 @@
 import React from "react"
 import Nav from "./Nav"
-import AddLink from "../modals/AddLink"
-import YoutubeLink from "../modals/YoutubeLink"
+import { AddLinkModalID } from "../modals/AddLink"
+// import YoutubeLink from "../modals/YoutubeLink"
+import { show } from "@ebay/nice-modal-react"
 
 import type {
-  MakeModalFunction,
   AddNewDownloadEntry
 } from "../types"
 
 interface AsideProps {
-  makeModal: MakeModalFunction
   addNewDownload: AddNewDownloadEntry
 }
 
-export default React.memo(function Asside({ makeModal, addNewDownload }: AsideProps) {
+export default React.memo(function Asside({ addNewDownload }: AsideProps) {
   return (
     <aside>
 
@@ -25,23 +24,37 @@ export default React.memo(function Asside({ makeModal, addNewDownload }: AsidePr
 
       <Nav>
 
-        <li
-          onClick={() => makeModal(
-            <AddLink makeModal={makeModal} addNewDownload={addNewDownload} />,
-            "Download anything from the web")}>
+        <li onClick={AddLinkClick}>
           Add Link
         </li>
 
-        <li
+        {/* <li
           onClick={() => makeModal(
             <YoutubeLink makeModal={makeModal} addNewDownload={addNewDownload} />,
             "Download videos from Youtube"
           )}>
           From Youtube
-        </li>
+        </li> */}
 
       </Nav>
 
     </aside>
   )
 })
+
+function AddLinkClick() {
+  show(AddLinkModalID).then(linkInfo => {
+    console.log(linkInfo)
+    /* makeModal(
+      <NewFileDialog
+        url={new URL(res.headers.get("x-wdm-finalurl") ?? '')}
+        makeModal={makeModal}
+        addNewDownload={addNewDownload}
+        size={fileSize}
+        defaultName={fileDefaultName}
+        resumable={resumable} />,
+      "File information"
+    )
+  */
+  }).catch(console.error)
+}
