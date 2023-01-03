@@ -1,12 +1,11 @@
 import React from "react"
-import Nav from "./Nav"
-import { AddLinkModalID } from "../modals/AddLink"
+import { AddLinkModalID } from "./modals/AddLink"
 // import YoutubeLink from "../modals/YoutubeLink"
 import { show } from "@ebay/nice-modal-react"
 
 import type {
   AddNewDownloadEntry
-} from "../types"
+} from "./types"
 
 interface AsideProps {
   addNewDownload: AddNewDownloadEntry
@@ -22,13 +21,14 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
         <img src="icons/download-from-cloud_550.png" alt="Keyboard Chair" />
       </div>
 
-      <Nav>
+      <nav>
+        <ol>
 
-        <li onClick={AddLinkClick}>
-          Add Link
-        </li>
+          <li onClick={AddLinkClick}>
+            Add Link
+          </li>
 
-        {/* <li
+          {/* <li
           onClick={() => makeModal(
             <YoutubeLink makeModal={makeModal} addNewDownload={addNewDownload} />,
             "Download videos from Youtube"
@@ -36,7 +36,8 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
           From Youtube
         </li> */}
 
-      </Nav>
+        </ol>
+      </nav>
 
     </aside>
   )

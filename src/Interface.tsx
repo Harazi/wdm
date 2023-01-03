@@ -1,5 +1,5 @@
 import React from "react"
-import Aside from "./aside/Aside"
+import SideBar from "./SideBar"
 import Main from "./Main"
 
 import type {
@@ -38,7 +38,7 @@ export default function Interface() {
   return (
     <div className="main-container">
 
-      <Aside addNewDownload={addNewDownload} />
+      <SideBar addNewDownload={addNewDownload} />
 
       <Main {...{ downloadList, removeDownloadEntry }} />
 
