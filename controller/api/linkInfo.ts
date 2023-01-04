@@ -6,11 +6,7 @@ import type {
   Response
 } from "express"
 
-interface ResponseObject {
-  contentLength: number | "unknown"
-  acceptRange: boolean
-  finalUrl: string
-}
+import type { LinkInfoApiResponse } from "../../src/types.js"
 
 export default async function handler(req: Request, res: Response) {
 
@@ -42,7 +38,7 @@ export default async function handler(req: Request, res: Response) {
 
       abortController.abort()
 
-      const responseObj: ResponseObject = {
+      const responseObj: LinkInfoApiResponse = {
         finalUrl: resOne.url,
         contentLength: "unknown",
         acceptRange: false

@@ -36,3 +36,9 @@ export interface YoutubeApiResponse {
   thumbnail: ThumbnailObject
   formats: VideoFormat[]
 }
+
+export interface LinkInfoApiResponse {
+  finalUrl: string
+  contentLength: number | "unknown"
+  acceptRange: boolean
+}
