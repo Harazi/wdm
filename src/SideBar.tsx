@@ -1,11 +1,15 @@
 import React from "react"
-import { AddLinkModalID } from "./modals/AddLink"
 // import YoutubeLink from "../modals/YoutubeLink"
-import { show } from "@ebay/nice-modal-react"
+import { AskInputModalID } from "./modals/AskInput"
+import { remove, show } from "@ebay/nice-modal-react"
+import { dlDir } from "./utils/fs"
 
 import type {
   AddNewDownloadEntry
 } from "./types"
+import { isValidLink } from "./utils/isValidLink"
+import { fetchLinkInfo } from "./utils/fetchLinkInfo"
+import { NewFileDialogModalID } from "./modals/NewFileDialog"
 
 interface AsideProps {
   addNewDownload: AddNewDownloadEntry
@@ -24,7 +28,7 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
       <nav>
         <ol>
 
-          <li onClick={AddLinkClick}>
+          <li onClick={() => AddLinkClick(addNewDownload)}>
             Add Link
           </li>
 
@@ -43,19 +47,38 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
   )
 })
 
-function AddLinkClick() {
-  show(AddLinkModalID).then(linkInfo => {
+async function AddLinkClick(addNewDownload: AddNewDownloadEntry) {
+  let errorMsg
+  let linkInfo: any
+
+  do {
+    const link = await show<string>(AskInputModalID, { title: "Download from link", errorMsg })
+
+    const url = isValidLink(link)
+    if (!url) {
+      errorMsg = "Invalid Link"
+      continue
+    }
+
+    linkInfo = await fetchLinkInfo(url)
+    if (!linkInfo.success) {
+      errorMsg = "Error while retrieving data"
+      continue
+    }
+
     console.log(linkInfo)
-    /* makeModal(
-      <NewFileDialog
-        url={new URL(res.headers.get("x-wdm-finalurl") ?? '')}
-        makeModal={makeModal}
-        addNewDownload={addNewDownload}
-        size={fileSize}
-        defaultName={fileDefaultName}
-        resumable={resumable} />,
-      "File information"
-    )
-  */
-  }).catch(console.error)
+    remove(AskInputModalID)
+  } while (errorMsg)
+
+  const fileInfo: any = await show(NewFileDialogModalID, {
+    url: new URL(linkInfo.data.finalUrl),
+    size: linkInfo.data.contentLength,
+    resumable: linkInfo.data.acceptRange,
+    defaultName: ''
+  })
+
+  console.log(fileInfo)
+  await dlDir()
+  remove(NewFileDialogModalID)
+  addNewDownload(fileInfo.url, fileInfo.name, fileInfo.parts, fileInfo.resumable, fileInfo.size)
 }
