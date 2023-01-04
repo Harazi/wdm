@@ -37,8 +37,14 @@ export interface YoutubeApiResponse {
   formats: VideoFormat[]
 }
 
-export interface LinkInfoApiResponse {
-  finalUrl: string
-  contentLength: number | "unknown"
-  acceptRange: boolean
+export type LinkInfoApiResponse = {
+  success: true,
+  data: {
+    finalUrl: string
+    contentLength: number | "unknown"
+    acceptRange: boolean
+  }
+} | {
+  success: false,
+  data: null
 }

@@ -39,9 +39,12 @@ export default async function handler(req: Request, res: Response) {
       abortController.abort()
 
       const responseObj: LinkInfoApiResponse = {
-        finalUrl: resOne.url,
-        contentLength: "unknown",
-        acceptRange: false
+        success: true,
+        data: {
+          finalUrl: resOne.url,
+          contentLength: "unknown",
+          acceptRange: false
+        }
       }
 
       const contentLength = resOne.headers.get("content-length")
@@ -50,15 +53,18 @@ export default async function handler(req: Request, res: Response) {
       if (!contentLength)
         return res.json(responseObj)
 
-      responseObj.contentLength = Number(contentLength)
+      responseObj.data.contentLength = Number(contentLength)
 
       if (
         resTwo.status === 206
         && contentRange === `bytes 0-${Number(contentLength) - 1}/${contentLength}`
       )
-        responseObj.acceptRange = true
+        responseObj.data.acceptRange = true
 
       res.json(responseObj)
     })
-    .catch(err => res.status(500).send("failed fetching"))
+    .catch(err => {
+      console.error(err)
+      res.status(500).json({ success: false, data: null })
+    })
 }
