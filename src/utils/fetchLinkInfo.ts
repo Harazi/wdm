@@ -1,4 +1,4 @@
-import type { LinkInfoApiResponse } from "../types"
+import type { LinkInfoApiResponse } from "@backend/types"
 
 export async function fetchLinkInfo(url: string): Promise<LinkInfoApiResponse> {
   try {

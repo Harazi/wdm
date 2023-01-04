@@ -6,7 +6,7 @@ import type {
   Response
 } from "express"
 
-import type { LinkInfoApiResponse } from "../../src/types.js"
+import type { LinkInfoApiResponse } from "../types.js"
 
 export default async function handler(req: Request, res: Response) {
 
