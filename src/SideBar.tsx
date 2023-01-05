@@ -10,6 +10,7 @@ import type {
 import { isValidLink } from "./utils/isValidLink"
 import { fetchLinkInfo } from "./utils/fetchLinkInfo"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
+import { LinkInfo } from "@backend/types"
 
 interface AsideProps {
   addNewDownload: AddNewDownloadEntry
@@ -48,32 +49,12 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
 })
 
 async function AddLinkClick(addNewDownload: AddNewDownloadEntry) {
-  let errorMsg
-  let linkInfo: any
-
-  do {
-    const link = await show<string>(AskInputModalID, { title: "Download from link", errorMsg })
-
-    const url = isValidLink(link)
-    if (!url) {
-      errorMsg = "Invalid Link"
-      continue
-    }
-
-    linkInfo = await fetchLinkInfo(url)
-    if (!linkInfo.success) {
-      errorMsg = "Error while retrieving data"
-      continue
-    }
-
-    console.log(linkInfo)
-    remove(AskInputModalID)
-  } while (errorMsg)
+  const linkInfo = await modalGetLinkInfo()
 
   const fileInfo: any = await show(NewFileDialogModalID, {
-    url: new URL(linkInfo.data.finalUrl),
-    size: linkInfo.data.contentLength,
-    resumable: linkInfo.data.acceptRange,
+    url: new URL(linkInfo.finalUrl),
+    size: linkInfo.contentLength,
+    resumable: linkInfo.acceptRange,
     defaultName: ''
   })
 
@@ -81,4 +62,22 @@ async function AddLinkClick(addNewDownload: AddNewDownloadEntry) {
   await dlDir()
   remove(NewFileDialogModalID)
   addNewDownload(fileInfo.url, fileInfo.name, fileInfo.parts, fileInfo.resumable, fileInfo.size)
+}
+
+async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {
+  const link = await show<string>(AskInputModalID, { title: "Download from link", errorMsg })
+
+  const url = isValidLink(link)
+  if (!url) {
+    remove(AskInputModalID)
+    return modalGetLinkInfo("Invalid Link")
+  }
+
+  const linkInfo = await fetchLinkInfo(url)
+  if (!linkInfo.success) {
+    remove(AskInputModalID)
+    return modalGetLinkInfo("Error while retrieving data")
+  }
+  remove(AskInputModalID)
+  return linkInfo.data
 }
