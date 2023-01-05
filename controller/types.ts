@@ -1,11 +1,13 @@
 export type LinkInfoApiResponse = {
   success: true,
-  data: {
-    finalUrl: string
-    contentLength: number | "unknown"
-    acceptRange: boolean
-  }
+  data: LinkInfo
 } | {
   success: false,
   data: null
+}
+
+export type LinkInfo = {
+  finalUrl: string
+  contentLength: number | "unknown"
+  acceptRange: boolean
 }
