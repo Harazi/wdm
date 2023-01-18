@@ -60,7 +60,7 @@ const AskInput = create(({
 
         </div>
 
-        {errorMsg &&
+        {errorMsg && !isLoading &&
           <div className="error-displayer">
             <p>{errorMsg}</p>
           </div>}
