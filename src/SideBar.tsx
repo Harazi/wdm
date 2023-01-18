@@ -11,6 +11,7 @@ import { isValidLink } from "./utils/isValidLink"
 import { fetchLinkInfo } from "./utils/fetchLinkInfo"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
 import { LinkInfo } from "@backend/types"
+import { nextRound } from "./utils/loop"
 
 interface AsideProps {
   addNewDownload: AddNewDownloadEntry
@@ -70,12 +71,14 @@ async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {
   const url = isValidLink(link)
   if (!url) {
     remove(AskInputModalID)
+    await nextRound()
     return modalGetLinkInfo("Invalid Link")
   }
 
   const linkInfo = await fetchLinkInfo(url)
   if (!linkInfo.success) {
     remove(AskInputModalID)
+    await nextRound()
     return modalGetLinkInfo("Error while retrieving data")
   }
   remove(AskInputModalID)
