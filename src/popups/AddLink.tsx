@@ -40,7 +40,7 @@ export default function AddLink({ makePopup, addNewDownload }: AddLinkProps) {
 
     let url = URLInput.current?.value ?? ''
 
-    if (!url.match(/https?:\/\/i/))
+    if (!url.match(/https?:\/\//i))
       url = "http://".concat(url)
 
     try {
