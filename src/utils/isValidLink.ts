@@ -1,5 +1,5 @@
 export function isValidLink(url: string) {
-  if (!url.match(/https?:\/\/i/)) {
+  if (!url.match(/https?:\/\//i)) {
     url = `http://${url}`
   }
   try {
