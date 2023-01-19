@@ -33,7 +33,7 @@ const AddLink = create(() => {
 
     let url = URLInput.current?.value ?? ''
 
-    if (!url.match(/https?:\/\/i/))
+    if (!url.match(/https?:\/\//i))
       url = "http://".concat(url)
 
     try {
