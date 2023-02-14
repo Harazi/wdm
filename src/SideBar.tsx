@@ -8,7 +8,7 @@ import type {
   AddNewDownloadEntry
 } from "./types"
 import { isValidLink } from "./utils/isValidLink"
-import { fetchLinkInfo } from "./utils/fetchLinkInfo"
+import { fetchLinkInfo } from "./utils/network"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
 import { LinkInfo } from "@backend/types"
 import { nextRound } from "./utils/loop"
