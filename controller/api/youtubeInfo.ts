@@ -5,30 +5,7 @@ import type {
   Request,
   Response
 } from "express"
-
-interface YoutubeResponse {
-  videoDetails: {
-    author: string
-    lengthSeconds: string
-    title: string
-    viewCount: string
-    thumbnail: {
-      thumbnails: {
-        url: string
-        height: number
-        width: number
-      }[]
-    }
-  }
-  streamingData: {
-    formats: {
-      url: string
-      mimeType: string
-      qualityLabel: string
-      fps: number
-    }[]
-  }
-}
+import { YoutubeResponse } from "../types.js"
 
 const YOUTUBE_API_URL = "https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
 
