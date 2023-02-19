@@ -6,7 +6,7 @@ import type {
   Response
 } from "express"
 
-import type { LinkInfoApiResponse } from "../types.js"
+import type { ApiResponseGuard, LinkInfo } from "../types.js"
 
 export default async function handler(req: Request, res: Response) {
 
@@ -38,7 +38,7 @@ export default async function handler(req: Request, res: Response) {
 
       abortController.abort()
 
-      const responseObj: LinkInfoApiResponse = {
+      const responseObj: ApiResponseGuard<LinkInfo> = {
         success: true,
         data: {
           finalUrl: resOne.url,

@@ -1,6 +1,6 @@
-import type { LinkInfoApiResponse } from "@backend/types"
+import type { ApiResponseGuard, LinkInfo } from "@backend/types"
 
-export async function fetchLinkInfo(url: string): Promise<LinkInfoApiResponse> {
+export async function fetchLinkInfo(url: string): Promise<ApiResponseGuard<LinkInfo>> {
   try {
     const linkInfo = await fetch(`api/linkInfo?url=${encodeURIComponent(url)}`).then(res => res.json())
     return linkInfo

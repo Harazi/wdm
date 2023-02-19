@@ -1,10 +1,4 @@
-export type LinkInfoApiResponse = {
-  success: true,
-  data: LinkInfo
-} | {
-  success: false,
-  data: null
-}
+export type ApiResponseGuard<T> = { success: true, data: T } | { success: false, data: null }
 
 export type LinkInfo = {
   finalUrl: string
