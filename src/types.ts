@@ -13,26 +13,3 @@ export type MakeModalFunction = (component: ReactNode, title: string) => void
 export type CloseModalFunction = VoidFunction
 export type AddNewDownloadEntry = (url: URL, name: string, parts: number, resumable: boolean, size: number | null) => void
 export type RemoveDownloadEntryFunction = (id: string) => void
-
-interface ThumbnailObject {
-  url: string
-  width: number
-  height: number
-}
-
-interface VideoFormat {
-  mimeType: string
-  extension: string
-  qualityLabel: string
-  fps: number
-  url: string
-}
-
-export interface YoutubeApiResponse {
-  author: string
-  title: string
-  lengthSeconds: string
-  viewCount: string
-  thumbnail: ThumbnailObject
-  formats: VideoFormat[]
-}
