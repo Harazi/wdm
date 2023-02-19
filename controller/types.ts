@@ -12,27 +12,52 @@ export type LinkInfo = {
   acceptRange: boolean
 }
 
-export type YoutubeResponse = {
-  videoDetails: {
-    author: string
-    lengthSeconds: string
-    title: string
-    viewCount: string
-    thumbnail: {
-      thumbnails: {
-        url: string
-        height: number
-        width: number
-      }[]
-    }
-  }
-  streamingData: {
-    formats: {
-      url: string
-      mimeType: string
-      qualityLabel: string
-      fps: number
-    }[]
-  }
+export interface YTThumbnail {
+  url: string
+  width: number
+  height: number
 }
 
+export interface YTObjectFormat {
+  itag: number
+  url: string
+  mimeType: string
+  contentLength: string
+}
+
+export interface YTSimpleFormat extends YTObjectFormat {
+  width: number
+  height: number
+  fps: number
+  qualityLabel: string
+  bitrate: number
+}
+
+export interface YTAdaptiveVideoFormat extends YTObjectFormat {
+  width: number
+  height: number
+  fps: number
+  qualityLabel: string
+  averageBitrate: number
+}
+
+export interface YTAdaptiveAudioFormat extends YTObjectFormat {
+  averageBitrate: number
+}
+
+export type YoutubeResponse = {
+  videoDetails: {
+    videoId: string
+    title: string
+    lengthSeconds: string
+    thumbnail: {
+      thumbnails: YTThumbnail[]
+    }
+    viewCount: string
+    author: string
+  }
+  streamingData: {
+    formats: YTSimpleFormat[]
+    adaptiveFormats: Array<YTAdaptiveAudioFormat | YTAdaptiveVideoFormat>
+  }
+}
