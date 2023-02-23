@@ -1,5 +1,4 @@
 import React from "react"
-// import YoutubeLink from "../modals/YoutubeLink"
 import { AskInputModalID } from "./modals/AskInput"
 import { remove, show } from "@ebay/nice-modal-react"
 import { dlDir } from "./utils/fs"
@@ -8,10 +7,11 @@ import type {
   AddNewDownloadEntry
 } from "./types"
 import { isValidLink } from "./utils/isValidLink"
-import { fetchLinkInfo } from "./utils/network"
+import { fetchLinkInfo, YTVideoMetadata } from "./utils/network"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
-import { LinkInfo } from "@backend/types"
+import { LinkInfo, YoutubeResponse } from "@backend/types"
 import { nextRound } from "./utils/loop"
+import { isValidYoutubeURL } from "./utils/isValidYoutubeURL"
 
 interface AsideProps {
   addNewDownload: AddNewDownloadEntry
@@ -29,19 +29,8 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
 
       <nav>
         <ol>
-
-          <li onClick={() => AddLinkClick(addNewDownload)}>
-            Add Link
-          </li>
-
-          {/* <li
-          onClick={() => makeModal(
-            <YoutubeLink makeModal={makeModal} addNewDownload={addNewDownload} />,
-            "Download videos from Youtube"
-          )}>
-          From Youtube
-        </li> */}
-
+          <li onClick={() => AddLinkClick(addNewDownload)}> Add Link </li>
+          <li onClick={() => handleYTClick(addNewDownload)}> Youtube Video </li>
         </ol>
       </nav>
 
@@ -65,6 +54,12 @@ async function AddLinkClick(addNewDownload: AddNewDownloadEntry) {
   addNewDownload(fileInfo.url, fileInfo.name, fileInfo.parts, fileInfo.resumable, fileInfo.size)
 }
 
+async function handleYTClick(addNewDownload: AddNewDownloadEntry) {
+  const metadata = await modalGetYTVideoMetadata()
+
+  console.log(metadata)
+}
+
 async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {
   const link = await show<string>(AskInputModalID, { title: "Download from link", errorMsg })
 
@@ -83,4 +78,29 @@ async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {
   }
   remove(AskInputModalID)
   return linkInfo.data
+}
+
+async function modalGetYTVideoMetadata(errorMsg?: string): Promise<YoutubeResponse> {
+  const input = await show<string>(AskInputModalID, {
+    title: "Download Youtube video",
+    errorMsg,
+    label: "Youtube link or video ID",
+    inputPlaceHolder: "youtu.be/Sklc_fQBmcs"
+  })
+
+  const id = isValidYoutubeURL(input)
+  if (!id) {
+    remove(AskInputModalID)
+    await nextRound()
+    return modalGetYTVideoMetadata("Invalid video identifier")
+  }
+
+  const metadata = await YTVideoMetadata(id)
+  if (!metadata.success) {
+    remove(AskInputModalID)
+    await nextRound()
+    return modalGetYTVideoMetadata("Error while retrieving data")
+  }
+  remove(AskInputModalID)
+  return metadata.data
 }
