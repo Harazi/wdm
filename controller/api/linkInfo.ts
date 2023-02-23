@@ -1,4 +1,4 @@
-import defaultUserAgent from "../utils/defaultUserAgent.js"
+import { windowsChrome } from "../utils/userAgents.js"
 import { enforcedRequestHeaders } from "../utils/headers.js"
 
 import type {
@@ -27,7 +27,7 @@ export default async function handler(req: Request, res: Response) {
   fetchHeaders.set("host", url.host)
   fetchHeaders.set("origin", url.origin)
   fetchHeaders.set("referer", url.origin.concat('/'))
-  fetchHeaders.set("user-agent", req.headers["user-agent"] ?? defaultUserAgent)
+  fetchHeaders.set("user-agent", req.headers["user-agent"] ?? windowsChrome)
 
   const fetchOne = fetch(url, { headers: fetchHeaders, redirect: "follow", signal: abortController.signal })
   fetchHeaders.set("range", "bytes=0-")
