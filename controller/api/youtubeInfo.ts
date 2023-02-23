@@ -1,5 +1,5 @@
-import { extension, contentType } from "mime-types"
-import defaultUserAgent from "../utils/defaultUserAgent.js"
+import { contentType } from "mime-types"
+import { android } from "../utils/userAgents.js"
 
 import type {
   Request,
@@ -24,7 +24,7 @@ export default async function handler(req: Request, res: Response) {
     youtubeRes = await fetch(YOUTUBE_API_URL, {
       method: "POST",
       headers: {
-        "user-agent": req.headers["user-agent"] ?? defaultUserAgent,
+        "user-agent": android,
         "content-type": contentType("json").toString()
       },
       body: JSON.stringify(youtubePostData(id))
@@ -57,43 +57,14 @@ export default async function handler(req: Request, res: Response) {
 const isValidYoutubeID = (id: string): boolean => typeof id === "string" && Boolean(id.match(/^[a-zA-Z0-9_-]{11}$/))
 
 const youtubePostData = (id: string) => ({
+  "videoId": id,
   "context": {
     "client": {
-      "hl": "en",
-      "clientName": "WEB",
-      "clientVersion": "2.20210721.00.00",
-      "clientFormFactor": "UNKNOWN_FORM_FACTOR",
-      "clientScreen": "WATCH",
-      "mainAppWebInfo": {
-        "graftUrl": `/watch?v=${id}`
-      }
+      "clientName": "ANDROID",
+      "clientVersion": "17.10.35",
+      "androidSdkVersion": 30
     },
-    "user": {
-      "lockedSafetyMode": false
-    },
-    "request": {
-      "useSsl": true,
-      "internalExperimentFlags": [
-
-      ],
-      "consistencyTokenJars": [
-
-      ]
-    }
   },
-  "videoId": id,
-  "playbackContext": {
-    "contentPlaybackContext": {
-      "vis": 0,
-      "splay": false,
-      "autoCaptionsDefaultOn": false,
-      "autonavState": "STATE_NONE",
-      "html5Preference": "HTML5_PREF_WANTS",
-      "lactMilliseconds": "-1"
-    }
-  },
-  "racyCheckOk": false,
-  "contentCheckOk": false
 })
 
 const isValidYoutubeResponse = (obj: any): obj is YoutubeResponse => Boolean(
