@@ -16,7 +16,7 @@ export interface YTObjectFormat {
   itag: number
   url: string
   mimeType: string
-  contentLength: string
+  contentLength?: string
 }
 
 export interface YTSimpleFormat extends YTObjectFormat {
