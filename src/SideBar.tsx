@@ -9,6 +9,7 @@ import type {
 import { isValidLink } from "./utils/isValidLink"
 import { fetchLinkInfo, YTVideoMetadata } from "./utils/network"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
+import { YTFormatSelectorModalID } from "./modals/YTFormatSelector"
 import { LinkInfo, YoutubeResponse } from "@backend/types"
 import { nextRound } from "./utils/loop"
 import { isValidYoutubeURL } from "./utils/isValidYoutubeURL"
@@ -58,6 +59,13 @@ async function handleYTClick(addNewDownload: AddNewDownloadEntry) {
   const metadata = await modalGetYTVideoMetadata()
 
   console.log(metadata)
+
+  const res = await show(YTFormatSelectorModalID, {
+    videoMetadata: metadata,
+  })
+
+  console.log(res)
+  remove(YTFormatSelectorModalID)
 }
 
 async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {
