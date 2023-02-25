@@ -15,7 +15,7 @@ export interface YTThumbnail {
 export interface YTObjectFormat {
   itag: number
   url: string
-  mimeType: string
+  mimeType: `${string}/${string}; codecs="${string}"`
   contentLength?: string
 }
 
