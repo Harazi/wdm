@@ -84,17 +84,14 @@ const YTFormatSelector = create(({ videoMetadata: { videoDetails, streamingData 
               ))}
 
               <option disabled> Audio only </option>
-              {streamingData.adaptiveFormats.filter(f => !Object.hasOwn(f, "fps")).map((f: YTAdaptiveAudioFormat) => (
+              {streamingData.adaptiveFormats.filter((f): f is YTAdaptiveAudioFormat => !Object.hasOwn(f, "fps")).map(f => (
                 <option key={f.itag} value={f.itag}>{format(f.averageBitrate)}/s; {f.mimeType}</option>
               ))}
 
               <option disabled> Video only </option>
-              {streamingData.adaptiveFormats.filter(f => Object.hasOwn(f, "fps")).map((f) => {
-                  const format = f as YTAdaptiveVideoFormat
-                  return (
-                      <option key={format.itag} value={format.itag}>{format.qualityLabel}; {format.mimeType}; {format.fps}fps</option>
-                  )
-              })}
+              {streamingData.adaptiveFormats.filter((f): f is YTAdaptiveVideoFormat => Object.hasOwn(f, "fps")).map((f) => (
+                <option key={f.itag} value={f.itag}>{f.qualityLabel}; {f.mimeType}; {f.fps}fps</option>
+              ))}
 
             </select>
           </div>
