@@ -25,7 +25,8 @@
         color: #f5f5f5;
         padding: 0.3em;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: rgb(0, 128, 128);
           transition: background-color 0.1s linear;
         }
@@ -87,7 +88,7 @@
       justify-content: flex-start;
       column-gap: 1em;
 
-      > div {
+      >div {
         flex-grow: 1;
       }
     }
@@ -115,7 +116,8 @@
         &.start button {
           background-color: rgba(0, 128, 128, 0.7);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background-color: rgb(0, 128, 128);
           }
         }
@@ -123,7 +125,8 @@
         &.cancel button {
           background-color: rgba(220, 20, 60, 0.7);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background-color: rgb(220, 20, 60)
           }
         }
@@ -237,7 +240,8 @@
         &.start button {
           background-color: rgba(0, 128, 128, 0.7);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background-color: rgb(0, 128, 128);
           }
         }
@@ -245,7 +249,8 @@
         &.cancel button {
           background-color: rgba(220, 20, 60, 0.7);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background-color: rgb(220, 20, 60)
           }
         }
@@ -254,7 +259,7 @@
   }
 }
 
-#popup .popup-box .content {
+#modal .modal-box .content {
 
   @include connect-to-url();
   @include new-file-dialog();
@@ -272,7 +277,8 @@
       font-size: 0.7rem;
     }
 
-    input, select {
+    input,
+    select {
       border: none;
       border-bottom: 1px solid black;
       border-radius: 0.3em;

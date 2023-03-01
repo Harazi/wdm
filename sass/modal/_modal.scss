@@ -1,4 +1,4 @@
-#popup {
+#modal {
   display: grid;
   position: fixed;
   top: 0;
@@ -8,14 +8,15 @@
   background-color: rgba(#000000, 0.4);
   backdrop-filter: blur(2px);
 
-  &.open .popup-box {
-    animation: popup-box-open 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+  &.open .modal-box {
+    animation: modal-box-open 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53) forwards;
 
-    @keyframes popup-box-open {
+    @keyframes modal-box-open {
       from {
         opacity: 0;
         transform: translateY(-15px)
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -23,14 +24,15 @@
     }
   }
 
-  &.closed .popup-box {
-    animation: popup-box-closed 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+  &.closed .modal-box {
+    animation: modal-box-closed 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53) forwards;
 
-    @keyframes popup-box-closed {
+    @keyframes modal-box-closed {
       from {
         opacity: 1;
         transform: translateY(0);
       }
+
       to {
         opacity: 0;
         transform: translateY(15px)
@@ -38,7 +40,7 @@
     }
   }
 
-  .popup-box {
+  .modal-box {
     display: grid;
     grid-template-rows: 30px 1fr;
     min-width: 500px;

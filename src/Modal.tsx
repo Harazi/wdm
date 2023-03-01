@@ -1,27 +1,29 @@
 import React from "react"
 import type { MouseEventHandler, KeyboardEventHandler } from "react"
 
-interface PopupProps {
-  render: React.ReactNode,
+interface ModalProps {
+  children: React.ReactNode,
   title: string,
-  closeFn: VoidFunction
+  onClose: VoidFunction,
+  afterClose: VoidFunction,
+  visible: boolean,
 }
 
-export default React.memo(function Popup({ render, title, closeFn }: PopupProps) {
+export default React.memo(function Modal({ children, title, onClose, afterClose, visible }: ModalProps) {
 
-  const [classN, setClassN] = React.useState("open")
+  const closeTimer = React.useRef(0)
 
   function closeModal() {
-    setClassN("closed") // Starts the animation
+    if (closeTimer.current) return
 
-    const timeoutID = setTimeout(closeFn, 500) // Close after 0.5s to get animation
-    return (() => clearTimeout(timeoutID))
+    onClose() // Starts the animation
+    closeTimer.current = setTimeout(afterClose, 500) // remove from tree after 0.5s to get animation
   }
 
   const click: MouseEventHandler<HTMLDivElement | HTMLButtonElement> = (e) => {
     if (
       !(e.target as Element).closest(".close-button")
-      && (e.target as Element).closest(".popup-box")
+      && (e.target as Element).closest(".modal-box")
     ) return // Clicked inside the box
 
     closeModal()
@@ -32,14 +34,10 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
       closeModal()
   }
 
-  React.useEffect(() => {
-    setClassN("open")
-  }, [render])
+  return (
+    <div id="modal" className={visible ? "open" : "closed"} onMouseDown={click} onKeyDown={keyDown}>
 
-  return render ? (
-    <div id="popup" className={classN} onMouseDown={click} onKeyDown={keyDown}>
-
-      <div className="popup-box">
+      <div className="modal-box">
 
         <div className="titlebar">
 
@@ -55,12 +53,12 @@ export default React.memo(function Popup({ render, title, closeFn }: PopupProps)
 
         <section className="content">
 
-          {render}
+          {children}
 
         </section>
 
       </div>
 
     </div>
-  ) : null
+  )
 })
