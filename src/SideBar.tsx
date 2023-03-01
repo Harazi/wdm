@@ -60,12 +60,14 @@ async function handleYTClick(addNewDownload: AddNewDownloadEntry) {
 
   console.log(metadata)
 
-  const res = await show(YTFormatSelectorModalID, {
+  const res: any = await show(YTFormatSelectorModalID, {
     videoMetadata: metadata,
   })
 
   console.log(res)
+  await dlDir()
   remove(YTFormatSelectorModalID)
+  addNewDownload(res.url, res.fileName, res.parts, res.resumable, res.size)
 }
 
 async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {

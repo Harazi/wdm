@@ -30,7 +30,10 @@ const YTFormatSelector = create(({ videoMetadata: { videoDetails, streamingData 
 
     modal.resolve({
       fileName,
-      url: selectedFormat.url,
+      url: new URL(selectedFormat.url),
+      parts: 1, // TODO: allow the user to specify how many parts
+      resumable: true, // Assume all links are resumable
+      size: Number(selectedFormat.contentLength) || 0
     })
   }
 
