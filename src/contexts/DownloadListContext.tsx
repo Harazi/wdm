@@ -12,7 +12,7 @@ export type DownloadEntry = {
 
 export type DownloadListType = {
   list: DownloadEntry[]
-  add: (properties: DownloadEntry) => void
+  add: (properties: Omit<DownloadEntry, "ID">) => void
   remove: (ID: DownloadEntry["ID"]) => void
 }
 
