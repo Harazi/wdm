@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react"
 import type { ReactNode } from "react"
 
-type DownloadEntry = {
+export type DownloadEntry = {
   ID: `${DownloadEntry["url"]["href"]}__${DownloadEntry["fileName"]}`
   url: URL,
   fileName: `${string}.${string}`,
@@ -10,7 +10,7 @@ type DownloadEntry = {
   parts: number
 }
 
-type DownloadListType = {
+export type DownloadListType = {
   list: DownloadEntry[]
   add: (properties: DownloadEntry) => void
   remove: (ID: DownloadEntry["ID"]) => void
