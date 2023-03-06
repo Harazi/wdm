@@ -2,7 +2,6 @@ import React, { useContext } from "react"
 import { AskInputModalID } from "./modals/AskInput"
 import { remove, show } from "@ebay/nice-modal-react"
 import { dlDir } from "./utils/fs"
-
 import { isValidLink } from "./utils/isValidLink"
 import { fetchLinkInfo, YTVideoMetadata } from "./utils/network"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
@@ -14,6 +13,7 @@ import { DownloadListContext } from "./contexts/DownloadListContext"
 
 import type { DownloadListType } from "./contexts/DownloadListContext"
 import type { NewFileDialogRes, NewFileDialogProps } from "./modals/NewFileDialog"
+import type { YTFormatSelectorRes, YTFormatSelectorProps } from "./modals/YTFormatSelector"
 
 export default function SideBar() {
   const { add } = useContext(DownloadListContext)
@@ -55,24 +55,15 @@ async function AddLinkClick(add: DownloadListType["add"]) {
 }
 
 async function handleYTClick(add: DownloadListType["add"]) {
-  const metadata = await modalGetYTVideoMetadata()
-
-  console.log(metadata)
-
-  const res: any = await show(YTFormatSelectorModalID, {
-    videoMetadata: metadata,
-  })
+  const videoMetadata = await modalGetYTVideoMetadata()
+  const props: YTFormatSelectorProps = { videoMetadata }
+  console.log(props)
+  const res: YTFormatSelectorRes = await show(YTFormatSelectorModalID, props)
 
   console.log(res)
   await dlDir()
   remove(YTFormatSelectorModalID)
-  add({
-    url: res.url,
-    fileName: res.fileName,
-    parts: res.parts,
-    resumable: res.resumable,
-    size: res.size
-  })
+  add(res)
 }
 
 async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {

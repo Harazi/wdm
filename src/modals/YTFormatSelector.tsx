@@ -6,10 +6,13 @@ import Modal from "../Modal"
 import { humanNumber } from "../utils/humanNumber"
 
 import type { YoutubeResponse, YTAdaptiveAudioFormat, YTAdaptiveVideoFormat } from "@backend/types"
+import type { DownloadEntry } from "src/contexts/DownloadListContext"
 
-interface YTFormatSelectorProps {
+export type YTFormatSelectorProps = {
   videoMetadata: YoutubeResponse
 }
+
+export type YTFormatSelectorRes = Omit<DownloadEntry, "ID">
 
 const YTFormatSelector = create(({ videoMetadata: { videoDetails, streamingData }}: YTFormatSelectorProps) => {
 
@@ -22,19 +25,17 @@ const YTFormatSelector = create(({ videoMetadata: { videoDetails, streamingData 
 
   function startDownload() {
 
-    const fileName = (
-      videoFileNameInput.current?.value
-        + "."
-        + selectedFormat.mimeType.slice(selectedFormat.mimeType.indexOf('/') + 1, selectedFormat.mimeType.indexOf(';'))
-    )
+    const fileName = `${videoFileNameInput.current?.value}.${selectedFormat.mimeType.slice(selectedFormat.mimeType.indexOf('/') + 1, selectedFormat.mimeType.indexOf(';'))}` as const
 
-    modal.resolve({
-      fileName,
+    const res: YTFormatSelectorRes = {
       url: new URL(selectedFormat.url),
-      parts: 1, // TODO: allow the user to specify how many parts
+      fileName,
+      size: Number(selectedFormat.contentLength) || undefined,
       resumable: true, // Assume all links are resumable
-      size: Number(selectedFormat.contentLength) || 0
-    })
+      parts: 1, // TODO: allow the user to specify how many parts
+    }
+
+    modal.resolve(res)
   }
 
   return (
