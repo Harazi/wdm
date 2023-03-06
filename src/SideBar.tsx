@@ -1,11 +1,7 @@
-import React from "react"
+import React, { useContext } from "react"
 import { AskInputModalID } from "./modals/AskInput"
 import { remove, show } from "@ebay/nice-modal-react"
 import { dlDir } from "./utils/fs"
-
-import type {
-  AddNewDownloadEntry
-} from "./types"
 import { isValidLink } from "./utils/isValidLink"
 import { fetchLinkInfo, YTVideoMetadata } from "./utils/network"
 import { NewFileDialogModalID } from "./modals/NewFileDialog"
@@ -13,12 +9,14 @@ import { YTFormatSelectorModalID } from "./modals/YTFormatSelector"
 import { LinkInfo, YoutubeResponse } from "@backend/types"
 import { nextRound } from "./utils/loop"
 import { isValidYoutubeURL } from "./utils/isValidYoutubeURL"
+import { DownloadListContext } from "./contexts/DownloadListContext"
 
-interface AsideProps {
-  addNewDownload: AddNewDownloadEntry
-}
+import type { DownloadListType } from "./contexts/DownloadListContext"
+import type { NewFileDialogRes, NewFileDialogProps } from "./modals/NewFileDialog"
+import type { YTFormatSelectorRes, YTFormatSelectorProps } from "./modals/YTFormatSelector"
 
-export default React.memo(function Asside({ addNewDownload }: AsideProps) {
+export default function SideBar() {
+  const { add } = useContext(DownloadListContext)
   return (
     <aside>
 
@@ -30,44 +28,42 @@ export default React.memo(function Asside({ addNewDownload }: AsideProps) {
 
       <nav>
         <ol>
-          <li onClick={() => AddLinkClick(addNewDownload)}> Add Link </li>
-          <li onClick={() => handleYTClick(addNewDownload)}> Youtube Video </li>
+          <li onClick={() => AddLinkClick(add)}> Add Link </li>
+          <li onClick={() => handleYTClick(add)}> Youtube Video </li>
         </ol>
       </nav>
 
     </aside>
   )
-})
+}
 
-async function AddLinkClick(addNewDownload: AddNewDownloadEntry) {
+async function AddLinkClick(add: DownloadListType["add"]) {
   const linkInfo = await modalGetLinkInfo()
 
-  const fileInfo: any = await show(NewFileDialogModalID, {
+  const props: NewFileDialogProps = {
     url: new URL(linkInfo.finalUrl),
-    size: linkInfo.contentLength,
+    size: typeof linkInfo.contentLength === "number" ? linkInfo.contentLength : undefined,
     resumable: linkInfo.acceptRange,
-    defaultName: ''
-  })
+  }
+
+  const fileInfo: NewFileDialogRes = await show(NewFileDialogModalID, props)
 
   console.log(fileInfo)
   await dlDir()
   remove(NewFileDialogModalID)
-  addNewDownload(fileInfo.url, fileInfo.name, fileInfo.parts, fileInfo.resumable, fileInfo.size)
+  add(fileInfo)
 }
 
-async function handleYTClick(addNewDownload: AddNewDownloadEntry) {
-  const metadata = await modalGetYTVideoMetadata()
-
-  console.log(metadata)
-
-  const res: any = await show(YTFormatSelectorModalID, {
-    videoMetadata: metadata,
-  })
+async function handleYTClick(add: DownloadListType["add"]) {
+  const videoMetadata = await modalGetYTVideoMetadata()
+  const props: YTFormatSelectorProps = { videoMetadata }
+  console.log(props)
+  const res: YTFormatSelectorRes = await show(YTFormatSelectorModalID, props)
 
   console.log(res)
   await dlDir()
   remove(YTFormatSelectorModalID)
-  addNewDownload(res.url, res.fileName, res.parts, res.resumable, res.size)
+  add(res)
 }
 
 async function modalGetLinkInfo(errorMsg?: string): Promise<LinkInfo> {

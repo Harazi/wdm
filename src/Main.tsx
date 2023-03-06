@@ -1,31 +1,21 @@
-import React from "react"
+import React, { useContext } from "react"
 import DownloadEntry from "./components/DownloadEntry"
+import { DownloadListContext } from "./contexts/DownloadListContext"
 
-import type {
-  DownloadEntryProperties,
-  RemoveDownloadEntryFunction,
-} from "./types"
+export default function Main() {
+  const { list } = useContext(DownloadListContext)
 
-interface MainProps {
-  downloadList: DownloadEntryProperties[]
-  removeDownloadEntry: RemoveDownloadEntryFunction
-}
-
-export default React.memo(function Main({ downloadList, removeDownloadEntry }: MainProps) {
   return (
     <main>
       <div id="download-list">
         <ul>
 
-          {downloadList.map((downloadObj) => (
-            <DownloadEntry
-              key={downloadObj.id}
-              {...downloadObj}
-              removeDownloadEntry={removeDownloadEntry} />
+          {list.map((entry) => (
+            <DownloadEntry key={entry.ID} {...entry} />
           ))}
 
         </ul>
       </div>
     </main>
   )
-})
+}

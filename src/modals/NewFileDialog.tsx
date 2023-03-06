@@ -2,13 +2,13 @@ import React from "react"
 import { format } from "bytes"
 import { useModal, create, register } from "@ebay/nice-modal-react"
 import Modal from "../Modal"
+import type { DownloadEntry } from "../contexts/DownloadListContext"
 
-interface NewFileDialogProps {
-  url: URL
-  size: number | "unknown"
-  defaultName: string
-  resumable: boolean
+export type NewFileDialogProps = Omit<DownloadEntry, "ID" | "fileName" | "parts"> & {
+  defaultName?: string
 }
+
+export type NewFileDialogRes = Omit<DownloadEntry, "ID">
 
 const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDialogProps) => {
 
@@ -22,18 +22,19 @@ const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDial
     if (!extensionInput.current) return
     if (!partsNumber.current) return
 
-    const name = `${fileNameInput.current.value}.${extensionInput.current.value}`
-    const parts = resumable ? partsNumber.current.value : 1
+    const fileName = `${fileNameInput.current.value}.${extensionInput.current.value}` as const
+    const parts = Number(partsNumber.current.value)
 
-    console.log(url, name, parts, resumable, size)
-
-    modal.resolve({
+    const res: NewFileDialogRes = {
       url,
-      name,
-      parts: Number(parts),
+      fileName,
+      size,
       resumable,
-      size: size === "unknown" ? 0 : size
-    })
+      parts,
+    }
+
+    console.log(res)
+    modal.resolve(res)
   }
 
   return (
@@ -45,7 +46,7 @@ const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDial
       <div className="new-file-dialog">
 
         <div className="file-info">
-          <div className="info">size: {size === "unknown" ? size : format(size, { unitSeparator: ' ' })}</div>
+          <div className="info">size: {typeof size === "number" ? format(size, { unitSeparator: ' ' }) : "unknown"}</div>
           <div className="info">resumable: {resumable ? "Yes" : "No"}</div>
         </div>
 
@@ -58,7 +59,7 @@ const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDial
 
           <div className="base-name label-input-pair">
             <label htmlFor="base-name">File name</label>
-            <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} autoFocus defaultValue={defaultName.match(/^(.*)\..*$/)?.[1]} />
+            <input type="text" id="base-name" placeholder="Sky Picture" ref={fileNameInput} autoFocus defaultValue={defaultName?.match(/^(.*)\..*$/)?.[1]} />
           </div>
 
           <div className="dot">
@@ -67,7 +68,7 @@ const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDial
 
           <div className="extension label-input-pair">
             <label htmlFor="extension">File extension</label>
-            <input type="text" id="extension" placeholder="jpg" ref={extensionInput} defaultValue={defaultName.match(/^.*\.(.*)/)?.[1]} />
+            <input type="text" id="extension" placeholder="jpg" ref={extensionInput} defaultValue={defaultName?.match(/^.*\.(.*)/)?.[1]} />
           </div>
 
         </div>
