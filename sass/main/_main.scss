@@ -11,7 +11,7 @@ main {
         display: grid;
         position: relative;
         padding: 0.5em;
-        background-color: #155e75;
+        overflow: hidden;
         color: white;
         border-radius: 0.5em;
         grid-template-areas:
@@ -44,6 +44,7 @@ main {
             padding-right: 0.3em;
 
             img {
+              display: inline;
               vertical-align: middle;
             }
           }
@@ -61,7 +62,8 @@ main {
             color: white;
             border-radius: 0.5em;
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               background-color: rgb(220, 20, 60)
             }
 
@@ -84,18 +86,18 @@ main {
           flex-flow: row nowrap;
 
           &.finished .fragment.finished {
-            background-color: powderblue;
+            background-color: #72dee750;
           }
 
           .fragment {
             flex: 1 0;
             position: relative;
-            background-color: #90ee90aa; // palegreen
+            background-color: #aeedc9a3;
             overflow: hidden;
             transition: background-color 0.2s ease-in-out;
 
             &.finished {
-              background-color: #90ee90;
+              background-color: #72e779cc;
             }
 
             &::after {
