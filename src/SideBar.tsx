@@ -13,6 +13,7 @@ import { isValidYoutubeURL } from "./utils/isValidYoutubeURL"
 import { DownloadListContext } from "./contexts/DownloadListContext"
 
 import type { DownloadListType } from "./contexts/DownloadListContext"
+import type { NewFileDialogRes, NewFileDialogProps } from "./modals/NewFileDialog"
 
 export default function SideBar() {
   const { add } = useContext(DownloadListContext)
@@ -39,23 +40,18 @@ export default function SideBar() {
 async function AddLinkClick(add: DownloadListType["add"]) {
   const linkInfo = await modalGetLinkInfo()
 
-  const fileInfo: any = await show(NewFileDialogModalID, {
+  const props: NewFileDialogProps = {
     url: new URL(linkInfo.finalUrl),
-    size: linkInfo.contentLength,
+    size: typeof linkInfo.contentLength === "number" ? linkInfo.contentLength : undefined,
     resumable: linkInfo.acceptRange,
-    defaultName: ''
-  })
+  }
+
+  const fileInfo: NewFileDialogRes = await show(NewFileDialogModalID, props)
 
   console.log(fileInfo)
   await dlDir()
   remove(NewFileDialogModalID)
-  add({
-    url: fileInfo.url,
-    fileName: fileInfo.name,
-    parts: fileInfo.parts,
-    resumable: fileInfo.resumable,
-    size: fileInfo.size
-  })
+  add(fileInfo)
 }
 
 async function handleYTClick(add: DownloadListType["add"]) {
