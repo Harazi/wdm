@@ -40,15 +40,20 @@ const setupMap = ({ size, resumable, parts }: { size?: number; resumable: boolea
 export default function DownloadEntry({ ID, url, fileName, size, resumable, parts }: DownloadEntry) {
 
   const [, forceUpdate] = useReducer((p) => !p, false)
-  const startTime = useMemo(Date.now, [])
+  const startTime = React.useRef(Date.now())
   const endTime = React.useRef<number | null>(null)
   const map = useMemo(() => setupMap({ size, resumable, parts }), [size, resumable, parts])
   const [status, setStatus] = React.useState<EntryStatus>(EntryStatus.Downloading)
   const { remove } = useContext(DownloadListContext)
   const dlDirP = useMemo(dlDir, [])
-  const intervalID = useMemo(() => setInterval(forceUpdate, 2000), [])
+  const intervalID = React.useRef(0)
 
-  React.useEffect(() => () => clearInterval(intervalID), [])
+  React.useEffect(() => {
+    intervalID.current = setInterval(forceUpdate, 2000)
+    return () => clearInterval(intervalID.current)
+  }, [])
+
+
   React.useEffect(() => {
 
     const abortController = new AbortController()
@@ -124,8 +129,8 @@ export default function DownloadEntry({ ID, url, fileName, size, resumable, part
 
       await writable.close()
       endTime.current = Date.now()
-      setFinished(true)
-      clearInterval(intervalID)
+      setStatus(EntryStatus.Finished)
+      clearInterval(intervalID.current)
     })()
 
   }, [map.every(({ finished }) => finished)])
