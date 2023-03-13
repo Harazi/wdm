@@ -63,12 +63,18 @@ export default function DownloadEntry({ ID, url, fileName, size, resumable, part
         return
       }
 
-      const res = await fetch(`api/get?url=${encodeURIComponent(url.href)}`, {
-        signal: abortController.signal,
-        headers: from === undefined || to === undefined ? {} : {
-          range: `bytes=${from}-${to}`
-        }
-      })
+      let res: Response
+      try {
+        res = await fetch(`api/get?url=${encodeURIComponent(url.href)}`, {
+          signal: abortController.signal,
+          headers: from === undefined || to === undefined ? {} : {
+            range: `bytes=${from}-${to}`
+          }
+        })
+      } catch (err) {
+        setStatus(EntryStatus.Error)
+        return
+      }
 
       //TODO: Add a way to show errors to the user
       if (!res.body) throw new Error("Response body is null!")
