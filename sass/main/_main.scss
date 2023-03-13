@@ -112,6 +112,10 @@ main {
             }
           }
         }
+
+        &.error {
+          background-color: #cb2544;
+        }
       }
     }
   }

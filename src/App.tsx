@@ -1,4 +1,4 @@
-import React from "react"
+import React, { StrictMode } from "react"
 import Interface from "./Interface"
 import LandingPage from "./landingPage"
 import { DownloadListProvider } from "./contexts/DownloadListContext"
@@ -10,8 +10,10 @@ export default function App() {
   }
 
   return (
-    <DownloadListProvider>
-      <Interface />
-    </DownloadListProvider>
+    <StrictMode>
+      <DownloadListProvider>
+        <Interface />
+      </DownloadListProvider>
+    </StrictMode>
   )
 }
