@@ -3,21 +3,8 @@ import { divrem } from "divrem"
 import { streamToFile } from "../utils/streamToFile"
 import { dlDir } from "../utils/fs"
 import { DownloadSummary } from "./DownloadSummary"
-import { DownloadListContext } from "../contexts/DownloadListContext"
+import { DownloadListContext, DownloadState } from "../contexts/DownloadListContext"
 import type { DownloadEntry } from "../contexts/DownloadListContext"
-
-type fragment = {
-  readonly from?: number,
-  readonly to?: number,
-  downloaded: number
-  finished: boolean
-}
-
-enum EntryStatus {
-  Downloading,
-  Finished,
-  Error,
-}
 
 const setupMap = ({ size, resumable, parts }: { size?: number; resumable: boolean; parts: number }): fragment[] => {
   if (!size || !resumable || parts === 1) return [{ downloaded: 0, finished: false }]
