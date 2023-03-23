@@ -93,31 +93,40 @@ export const DownloadListProvider = ({ children }: { children: ReactNode }) => {
       return
     }
 
+    entry.ac = new AbortController()
     const { map, state: status, ac: abortController, url, fileName } = entry
     const setStatus = (state: DownloadState) => entry.state = state
     const dlDirP = dlDir()
 
-    map.forEach(async ({ from, to }, i) => {
-      if (abortController.signal.aborted || status === DownloadState.Error) {
+    map.forEach(async (fragment, i) => {
+      if (fragment.finished || abortController.signal.aborted || status === DownloadState.Error) {
         return
       }
+
+      const dirHandle = await dlDirP
+      const fileHandle = await dirHandle.getFileHandle(`${fileName}.part_${i}`, { create: true })
+      const file = await fileHandle.getFile()
+
+      const stateInSyncWithFile = fragment.downloaded === file.size
+      const resume = entry.resumable && fragment.downloaded > 0 && stateInSyncWithFile
 
       let res: Response
       try {
         res = await fetch(`api/get?url=${encodeURIComponent(url.href)}`, {
           signal: abortController.signal,
-          headers: from === undefined || to === undefined ? {} : {
-            range: `bytes=${from}-${to}`
+          headers: fragment.from === undefined || fragment.to === undefined ? {} : {
+            range: `bytes=${resume ? fragment.from + fragment.downloaded : fragment.from}-${fragment.to}`
           }
         })
       } catch (err) {
-        setStatus(DownloadState.Error)
+        setStatus(err instanceof DOMException ? DownloadState.Paused : DownloadState.Error)
         return
       }
 
       //TODO: Add a way to show errors to the user
       if (!res.body) throw new Error("Response body is null!")
 
+      // res.body.pipeTo
       setStatus(DownloadState.Downloading)
       const reader = res.body.getReader()
 
@@ -131,10 +140,10 @@ export const DownloadListProvider = ({ children }: { children: ReactNode }) => {
         writer,
         on: {
           progress: (length) => {
-            map[i].downloaded += length
+            fragment.downloaded += length
           },
           finish: async () => {
-            await writable.close()
+            await writer.close()
             map[i].finished = true
             if (entry.map.every(({ finished }) => finished)) {
               finalize(dirHandle, entry)
@@ -144,6 +153,12 @@ export const DownloadListProvider = ({ children }: { children: ReactNode }) => {
             await writer.close()
 
             // Save the parts for resuming?
+            if (err instanceof DOMException && entry.resumable) {
+              setStatus(DownloadState.Paused)
+              return
+            }
+
+            setStatus(DownloadState.Error)
             await dirHandle.removeEntry(`${fileName}.part_${i}`)
           },
         }
