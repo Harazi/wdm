@@ -1,6 +1,6 @@
 interface StreamToFileParams {
   reader: ReadableStreamDefaultReader
-  writable: FileSystemWritableFileStream
+  writer: WritableStreamDefaultWriter
   on?: StreamToFileEvents
 }
 
@@ -10,7 +10,7 @@ interface StreamToFileEvents {
   error?: (error: unknown) => void
 }
 
-export async function streamToFile({ reader, writable, on }: StreamToFileParams) {
+export async function pipeTo({ reader, writer, on }: StreamToFileParams) {
   const startTime = Date.now()
 
   while (true) {
@@ -28,7 +28,7 @@ export async function streamToFile({ reader, writable, on }: StreamToFileParams)
       break
     }
 
-    await writable.write(value)
+    await writer.write(value)
     on?.progress?.(value.length)
   }
 }

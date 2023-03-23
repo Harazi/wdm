@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react"
 import { divrem } from "divrem"
-import { streamToFile } from "../utils/streamToFile"
+import { pipeTo } from "../utils/pipeTo"
 import { dlDir } from "../utils/fs"
 import type { ReactNode } from "react"
 
@@ -121,12 +121,14 @@ export const DownloadListProvider = ({ children }: { children: ReactNode }) => {
       setStatus(DownloadState.Downloading)
       const reader = res.body.getReader()
 
-      const dirHandle = await dlDirP
-      const fileHandle = await dirHandle.getFileHandle(`${fileName}.part_${i}`, { create: true })
-      const writable = await fileHandle.createWritable({ keepExistingData: false })
-      streamToFile({
+      const writable = await fileHandle.createWritable({ keepExistingData: resume })
+      if (resume) {
+        await writable.seek(fragment.downloaded)
+      }
+      const writer = writable.getWriter()
+      pipeTo({
         reader,
-        writable,
+        writer,
         on: {
           progress: (length) => {
             map[i].downloaded += length
@@ -138,9 +140,9 @@ export const DownloadListProvider = ({ children }: { children: ReactNode }) => {
               finalize(dirHandle, entry)
             }
           },
-          error: async () => {
-            setStatus(DownloadState.Error)
-            await writable.close()
+          error: async (err) => {
+            await writer.close()
+
             // Save the parts for resuming?
             await dirHandle.removeEntry(`${fileName}.part_${i}`)
           },
