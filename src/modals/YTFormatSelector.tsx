@@ -12,7 +12,7 @@ export type YTFormatSelectorProps = {
   videoMetadata: YoutubeResponse
 }
 
-export type YTFormatSelectorRes = Omit<DownloadEntry, "ID">
+export type YTFormatSelectorRes = Omit<DownloadEntry, "ID" | "state" | "map" | "ac">
 
 const YTFormatSelector = create(({ videoMetadata: { videoDetails, streamingData }}: YTFormatSelectorProps) => {
 

@@ -1,52 +1,21 @@
-import React, { useReducer, useContext, useMemo } from "react"
-import { divrem } from "divrem"
-import { streamToFile } from "../utils/streamToFile"
-import { dlDir } from "../utils/fs"
+import React, { useReducer, useContext } from "react"
 import { DownloadSummary } from "./DownloadSummary"
-import { DownloadListContext } from "../contexts/DownloadListContext"
+import { DownloadListContext, DownloadState } from "../contexts/DownloadListContext"
 import type { DownloadEntry } from "../contexts/DownloadListContext"
 
-type fragment = {
-  readonly from?: number,
-  readonly to?: number,
-  downloaded: number
-  finished: boolean
-}
-
-enum EntryStatus {
-  Downloading,
-  Finished,
-  Error,
-}
-
-const setupMap = ({ size, resumable, parts }: { size?: number; resumable: boolean; parts: number }): fragment[] => {
-  if (!size || !resumable || parts === 1) return [{ downloaded: 0, finished: false }]
-
-  const { count, rem } = divrem(size, parts)
-  let progress = 0
-
-  const map = Array(parts).fill(null).map(() => ({
-    from: progress,
-    to: (progress += count) - 1,
-    downloaded: 0,
-    finished: false,
-  }))
-
-  map[map.length - 1].to += rem
-
-  return map
-}
-
-export default function DownloadEntry({ ID, url, fileName, size, resumable, parts }: DownloadEntry) {
+export default function DownloadEntry({ ID }: { ID: DownloadEntry["ID"] }) {
 
   const [, forceUpdate] = useReducer((p) => !p, false)
+  const { get, remove, resume, pause } = useContext(DownloadListContext)
+  const entry = get(ID)
+  if (!entry) {
+    console.error("Couldn't find entry with ID", ID)
+    return null
+  }
   const startTime = React.useRef(Date.now())
   const endTime = React.useRef<number | null>(null)
-  const map = useMemo(() => setupMap({ size, resumable, parts }), [size, resumable, parts])
-  const [status, setStatus] = React.useState<EntryStatus>(EntryStatus.Downloading)
-  const { remove } = useContext(DownloadListContext)
-  const dlDirP = useMemo(dlDir, [])
   const intervalID = React.useRef(0)
+  const { map, state, size, url, fileName, resumable } = entry
 
   React.useEffect(() => {
     intervalID.current = setInterval(forceUpdate, 2000)
@@ -55,97 +24,18 @@ export default function DownloadEntry({ ID, url, fileName, size, resumable, part
 
 
   React.useEffect(() => {
-
-    const abortController = new AbortController()
-
-    map.forEach(async ({ from, to }, i) => {
-      if (abortController.signal.aborted || status === EntryStatus.Error) {
-        return
-      }
-
-      let res: Response
-      try {
-        res = await fetch(`api/get?url=${encodeURIComponent(url.href)}`, {
-          signal: abortController.signal,
-          headers: from === undefined || to === undefined ? {} : {
-            range: `bytes=${from}-${to}`
-          }
-        })
-      } catch (err) {
-        setStatus(EntryStatus.Error)
-        return
-      }
-
-      //TODO: Add a way to show errors to the user
-      if (!res.body) throw new Error("Response body is null!")
-
-      setStatus(EntryStatus.Downloading)
-      const reader = res.body.getReader()
-
-      const dirHandle = await dlDirP
-      const fileHandle = await dirHandle.getFileHandle(`${fileName}.part_${i}`, { create: true })
-      const writable = await fileHandle.createWritable({ keepExistingData: false })
-      streamToFile({
-        reader,
-        writable,
-        on: {
-          progress: (length) => {
-            map[i].downloaded += length
-          },
-          finish: async () => {
-            await writable.close()
-            map[i].finished = true
-            forceUpdate()
-          },
-          error: async () => {
-            setStatus(EntryStatus.Error)
-            await writable.close()
-            // Save the parts for resuming?
-            await dirHandle.removeEntry(`${fileName}.part_${i}`)
-            clearInterval(intervalID.current)
-          },
-        }
-      })
-    })
-
-    return () => {
-      console.log("aborting right now")
-      abortController.abort()
-    }
-  }, [])
-
-  React.useEffect(() => {
     // Initial run
-    if (!map.every(({ finished }) => finished)) return
+    if (entry.state !== DownloadState.Finished) return
 
-    (async () => {
-      const dirHandle = await dlDirP
-
-      const writable = await dirHandle.getFileHandle(fileName, { create: true })
-        .then(handle => handle.createWritable({ keepExistingData: false }))
-
-      for (const index in map) {
-        const stream = await dirHandle.getFileHandle(`${fileName}.part_${index}`, { create: false })
-          .then(handle => handle.getFile())
-          .then(file => file.stream())
-
-        await stream.pipeTo(writable, { preventClose: true })
-        await dirHandle.removeEntry(`${fileName}.part_${index}`)
-      }
-
-      await writable.close()
-      endTime.current = Date.now()
-      setStatus(EntryStatus.Finished)
-      clearInterval(intervalID.current)
-    })()
-
-  }, [map.every(({ finished }) => finished)])
+    endTime.current = Date.now()
+    clearInterval(intervalID.current)
+  }, [entry.state])
 
 
   return (
-    <li className={status === EntryStatus.Error ? "error" : undefined}>
+    <li className={state === DownloadState.Error ? "error" : undefined}>
 
-      <div className={`download-progress ${status === EntryStatus.Finished && "finished"}`} >
+      <div className={`download-progress ${state === DownloadState.Finished && "finished"}`} >
         {map.map(({ from, to, downloaded, finished }, index) => (
           <span
             key={index}
@@ -162,14 +52,14 @@ export default function DownloadEntry({ ID, url, fileName, size, resumable, part
         {url.href}
       </span>
 
-      {status === EntryStatus.Finished
+      {state === DownloadState.Finished
         ? <DownloadSummary time={((endTime.current ?? Date.now()) - startTime.current) / 1000} size={map.reduce((acc, { downloaded }) => acc + downloaded, 0)} />
-        : status === EntryStatus.Downloading
+        : state === DownloadState.Downloading
           ? (
             <div className="controll-buttons">
 
               {resumable && (
-                <button type="button" className="pause" disabled>
+                <button type="button" className="pause" onClick={() => pause(ID)}>
                   <img src="icons/pause_24.svg" alt="Pause Icon" />
                   Pause
                 </button>
@@ -182,9 +72,10 @@ export default function DownloadEntry({ ID, url, fileName, size, resumable, part
 
             </div>
           )
-          : (
-            <div className="download-summary">Failed</div>
-          )}
+          : state === DownloadState.Paused
+            ? <div className="download-summary" onClick={() => resume(ID)}>Paused</div> 
+            : <div className="download-summary">Failed</div>
+      }
     </li>
   )
 }

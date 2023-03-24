@@ -11,7 +11,7 @@ export default function Main() {
         <ul>
 
           {list.map((entry) => (
-            <DownloadEntry key={entry.ID} {...entry} />
+            <DownloadEntry key={entry.ID} ID={entry.ID} />
           ))}
 
         </ul>

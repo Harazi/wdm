@@ -4,11 +4,11 @@ import { useModal, create, register } from "@ebay/nice-modal-react"
 import Modal from "../Modal"
 import type { DownloadEntry } from "../contexts/DownloadListContext"
 
-export type NewFileDialogProps = Omit<DownloadEntry, "ID" | "fileName" | "parts"> & {
+export type NewFileDialogProps = Omit<DownloadEntry, "ID" | "fileName" | "parts" | "state" | "map" | "ac"> & {
   defaultName?: string
 }
 
-export type NewFileDialogRes = Omit<DownloadEntry, "ID">
+export type NewFileDialogRes = Omit<DownloadEntry, "ID" | "state" | "map" | "ac">
 
 const NewFileDialog = create(({ url, size, defaultName, resumable }: NewFileDialogProps) => {
 
